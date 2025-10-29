@@ -8,11 +8,11 @@ package com.mycompany.candyknight;
  *
  * @author felip
  */
-public class EspadaDeAlcaçuz implements Coletavel {
+public class EspadaDeAlcacuz implements Coletavel {
     
     private int novoAtaque;
 
-    public EspadaDeAlcaçuz() {
+    public EspadaDeAlcacuz() {
         this.novoAtaque = 25;
     }
     
