@@ -39,4 +39,37 @@ public abstract class EntidadeJogo {
     public int getPontosDeVidaAtuais() { return pontosDeVidaAtuais; }
     public int getForcaAtaque() { return forcaAtaque; }
     public boolean estaVivo() { return this.pontosDeVidaAtuais > 0; }
+    // ... (depois dos seus métodos get)
+
+    // Necessário para PocaoDeCalda e PeDeMolequinho
+    public void curar(int quantidade) {
+        this.pontosDeVidaAtuais += quantidade;
+        if (this.pontosDeVidaAtuais > this.pontosDeVidaMax) {
+            this.pontosDeVidaAtuais = this.pontosDeVidaMax;
+        }
+        System.out.println(this.nome + " recuperou " + quantidade + " de vida!");
+    }
+    protected void setNome(String novoNome)
+    {
+        this.nome = novoNome;
+    }
+
+    // Necessário para PeDeMolequinho (Fase 2)
+    protected void setPontosDeVidaAtuais(int valor) {
+        if (valor < 0) {
+            this.pontosDeVidaAtuais = 0;
+        } else if (valor > this.pontosDeVidaMax) {
+            this.pontosDeVidaAtuais = this.pontosDeVidaMax;
+        } else {
+            this.pontosDeVidaAtuais = valor;
+        }
+    }
+
+    // Necessário para PeDeMolequinho (Fase 2)
+    protected void setPontosDeVidaMax(int valor) {
+        this.pontosDeVidaMax = valor;
+        if (this.pontosDeVidaAtuais > this.pontosDeVidaMax) {
+            this.pontosDeVidaAtuais = this.pontosDeVidaMax;
+        }
+    }
 }
