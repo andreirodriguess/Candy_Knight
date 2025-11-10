@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.mycompany.candyknight;
+package candyknight;
 
 /**
  *
@@ -13,19 +13,19 @@ public abstract class EntidadeJogo {
     private String nome;
     private int pontosDeVidaMax;
     private int pontosDeVidaAtuais;
-    private int forcaAtaque;
+    private int potencia; //capacidade de causar dano/curar
 
-    public EntidadeJogo(String nome, int vidaMax, int forca) {
+    public EntidadeJogo(String nome, int vidaMax, int potencia) {
         this.nome = nome;
         this.pontosDeVidaMax = vidaMax;
         this.pontosDeVidaAtuais = vidaMax;
-        this.forcaAtaque = forca;
+        this.potencia = potencia;
     }
 
     public abstract void atacar(EntidadeJogo alvo);
     public abstract void morrer();
 
-    public void receberDano(int quantidade) {
+    public void receberDano(int quantidade){
         this.pontosDeVidaAtuais -= quantidade;
         System.out.println(this.nome + " recebeu " + quantidade + " de dano!");
 
@@ -37,7 +37,7 @@ public abstract class EntidadeJogo {
 
     public String getNome() { return nome; }
     public int getPontosDeVidaAtuais() { return pontosDeVidaAtuais; }
-    public int getForcaAtaque() { return forcaAtaque; }
+    public int getPotencia() { return potencia; }
     public boolean estaVivo() { return this.pontosDeVidaAtuais > 0; }
     // ... (depois dos seus métodos get)
 

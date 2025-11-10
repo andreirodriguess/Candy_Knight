@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.mycompany.candyknight;
+package Candyknight;
 
 /**
  *
@@ -19,5 +19,14 @@ public abstract class MonstroDoce extends EntidadeJogo {
 
     public int getRecompensaEmDinheiro() {
         return recompensaEmDinheiro;
+    }
+    
+    @Override
+    public void atacar(EntidadeJogo alvo)
+    {
+        boolean alvo_armado = alvo.getArmado();
+        if(!alvo_armado)//se o alvo não estiver armado, o monstro ataca com seus pontos de vida
+            alvo.receberDano(this.getPontosDeVidaAtuais());
+        
     }
 }
