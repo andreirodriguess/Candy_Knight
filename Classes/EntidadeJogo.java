@@ -14,17 +14,23 @@ public abstract class EntidadeJogo {
     private int pontosDeVidaMax;
     private int pontosDeVidaAtuais;
     private int potencia; //capacidade de causar dano/curar
+    private boolean armado;
 
     public EntidadeJogo(String nome, int vidaMax, int potencia) {
         this.nome = nome;
         this.pontosDeVidaMax = vidaMax;
         this.pontosDeVidaAtuais = vidaMax;
         this.potencia = potencia;
+        this.armado = false;
     }
 
     public abstract void atacar(EntidadeJogo alvo);
     public abstract void morrer();
 
+    public boolean getArmado()
+    {
+        return this.armado;
+    }
     public void receberDano(int quantidade){
         this.pontosDeVidaAtuais -= quantidade;
         System.out.println(this.nome + " recebeu " + quantidade + " de dano!");

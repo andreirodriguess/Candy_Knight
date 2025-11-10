@@ -18,7 +18,7 @@ de ataque deles e verifica se estão vivos após a interação)
 consumida/derrotada.
 
  */
-package Candyknight;
+package candyknight;
 
 /**
  *

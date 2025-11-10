@@ -1,5 +1,5 @@
 
-package Candyknight;
+package candyknight;
 
 import javax.swing.*;
 import java.awt.FlowLayout;
