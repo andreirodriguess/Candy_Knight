@@ -59,6 +59,10 @@ public abstract class EntidadeJogo {
     {
         this.nome = novoNome;
     }
+    public void setPotencia(int potencia)
+    {
+        this.potencia = potencia;
+    }
 
     // Necessário para PeDeMolequinho (Fase 2)
     protected void setPontosDeVidaAtuais(int valor) {
@@ -77,5 +81,8 @@ public abstract class EntidadeJogo {
         if (this.pontosDeVidaAtuais > this.pontosDeVidaMax) {
             this.pontosDeVidaAtuais = this.pontosDeVidaMax;
         }
+    }
+    public void setArmado(boolean estado) {
+        this.armado = estado;
     }
 }

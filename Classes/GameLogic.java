@@ -1,9 +1,7 @@
-package candyknight; // Pacote raiz
+package candyknight;
 
 import java.util.ArrayList;
 import java.util.Collections;
-
-// Importa TUDO dos seus pacotes de Entidades e Coletaveis
 import candyknight.Entidades.*;
 import candyknight.Coletaveis.*;
 
@@ -13,6 +11,19 @@ import candyknight.Coletaveis.*;
  */
 public class GameLogic {
     
+    // +++ NOVO: Enum para Direções +++
+    /**
+     * Define as direções de movimento possíveis.
+     * Usar um enum torna o código mais limpo e seguro.
+     */
+    public enum Direcao {
+        CIMA,
+        BAIXO,
+        ESQUERDA,
+        DIREITA
+    }
+    // +++ Fim da Adição +++
+
     private ArrayList<Celula> tabuleiro;
     private final int TAMANHO_TABULEIRO = 9; // 3x3
     private int posicaoJogador;
@@ -33,30 +44,76 @@ public class GameLogic {
         }
 
         // 2. Adiciona o jogador (ex: posição 4, o centro)
-        // (Note o caminho completo para a classe Cavaleiro)
         tabuleiro.get(4).setEntidade(new candyknight.Entidades.Cavaleiro("Sir Doce"));
         this.posicaoJogador = 4;
 
         // 3. Adiciona monstros (ex: posições 1 e 7)
-        // (Note os caminhos completos)
         tabuleiro.get(1).setEntidade(new candyknight.Entidades.UrsoDeGoma());
         tabuleiro.get(7).setEntidade(new candyknight.Entidades.SoldadoGengibre());
 
         // 4. Adiciona itens (ex: posições 3 e 5)
-        tabuleiro.get(3).setItem(new candyknight.Coletaveis.PocaoDeCalda());
-        tabuleiro.get(5).setItem(new candyknight.Coletaveis.EscudoDeGoma());
-        
-        // (Eventualmente, você vai querer popular isso de forma aleatória)
+        // (Adicionei a EspadaDeAlcacuz para testar a tua correção!)
+        tabuleiro.get(3).setItem(new candyknight.Coletaveis.EspadaDeAlcacuz()); 
+        tabuleiro.get(5).setItem(new candyknight.Coletaveis.PocaoDeCalda());
     }
 
+    // +++ MÉTODO NOVO (Lógica de Direção) +++
     /**
-     * Método de exemplo para mover o jogador.
-     * (Você precisará de lógica para mapear cliques ou teclas para 'proximaPosicao')
-     * @param proximaPosicao O índice (0-8) para onde o jogador quer ir.
+     * Tenta mover o jogador numa direção específica.
+     * @param direcao A direção (CIMA, BAIXO, ESQUERDA, DIREITA) para onde mover.
      */
-    public void tentarMoverJogador(int proximaPosicao) {
+    public void tentarMoverJogador(Direcao direcao) {
         
-        // Proteção para não sair do array
+        int proximaPosicao = -1;
+        int posAtual = this.posicaoJogador;
+
+        // 1. Calcula a posição de destino e verifica os limites do tabuleiro
+        switch (direcao) {
+            case CIMA:
+                // Não pode mover para cima se estiver na linha 0 (pos 0, 1, 2)
+                if (posAtual < 3) {
+                    System.out.println("Não pode mover-se para cima. (Borda do tabuleiro)");
+                    return; // Para a execução do método
+                }
+                proximaPosicao = posAtual - 3; // Move uma linha para cima
+                break;
+
+            case BAIXO:
+                // Não pode mover para baixo se estiver na linha 2 (pos 6, 7, 8)
+                if (posAtual > 5) {
+                    System.out.println("Não pode mover-se para baixo. (Borda do tabuleiro)");
+                    return;
+                }
+                proximaPosicao = posAtual + 3; // Move uma linha para baixo
+                break;
+
+            case ESQUERDA:
+                // Não pode mover para esquerda se estiver na coluna 0 (pos 0, 3, 6)
+                if (posAtual % 3 == 0) {
+                    System.out.println("Não pode mover-se para a esquerda. (Borda do tabuleiro)");
+                    return;
+                }
+                proximaPosicao = posAtual - 1; // Move uma coluna para esquerda
+                break;
+
+            case DIREITA:
+                // Não pode mover para direita se estiver na coluna 2 (pos 2, 5, 8)
+                if (posAtual % 3 == 2) {
+                    System.out.println("Não pode mover-se para a direita. (Borda do tabuleiro)");
+                    return;
+                }
+                proximaPosicao = posAtual + 1; // Move uma coluna para direita
+                break;
+        }
+
+        // 2. Se o cálculo foi bem-sucedido, processa a interação
+        if (proximaPosicao != -1) {
+            processarInteracao(proximaPosicao);
+        }
+    }
+    
+    private void processarInteracao(int proximaPosicao) {
+        
         if (proximaPosicao < 0 || proximaPosicao >= TAMANHO_TABULEIRO) {
             System.out.println("Movimento inválido.");
             return;
@@ -65,51 +122,71 @@ public class GameLogic {
         Celula celulaAtual = tabuleiro.get(posicaoJogador);
         Celula celulaDestino = tabuleiro.get(proximaPosicao);
 
-        // Pega o jogador (fazendo "cast" da EntidadeJogo)
         Cavaleiro jogador = (Cavaleiro) celulaAtual.getEntidade();
 
         // 1. Interage com item na célula de destino
         if (celulaDestino.temItem()) {
             Coletavel item = celulaDestino.getItem();
             System.out.println(jogador.getNome() + " encontrou e usou " + item.getNome() + "!");
-            item.usar(jogador); //
-            celulaDestino.limparItem(); // Limpa o item do chão
+            item.usar(jogador);
+            celulaDestino.limparItem(); 
         }
 
         // 2. Interage com entidade (monstro) na célula de destino
         if (celulaDestino.temEntidade()) {
             EntidadeJogo monstro = celulaDestino.getEntidade();
-            System.out.println(jogador.getNome() + " batalha contra " + monstro.getNome() + "!");
+            System.out.println(jogador.getNome() + " encontra " + monstro.getNome() + "!");
             
-            // Batalha simples
-            jogador.atacar(monstro); //
-            if (monstro.estaVivo()) {
-                monstro.atacar(jogador); //
+            // +++ INÍCIO MODIFICAÇÃO (REGRA 1: Combate) +++
+            
+            // O jogador só ataca se estiver armado
+            if (jogador.getArmado()) {
+                System.out.println(jogador.getNome() + " está armado e ataca!");
+                jogador.atacar(monstro);
+            } else {
+                System.out.println(jogador.getNome() + " está desarmado e não pode atacar!");
             }
 
-            // Se o monstro foi derrotado na batalha
+            // Se o monstro sobreviveu...
+            if (monstro.estaVivo()) {
+                // Ele só ataca de volta se o jogador estiver SEM arma
+                if (!jogador.getArmado()) {
+                    System.out.println(monstro.getNome() + " revida o encontro!");
+                    monstro.atacar(jogador);
+                } else {
+                    System.out.println(monstro.getNome() + " fica intimidado pela arma do jogador!");
+                }
+            }
+            // +++ FIM MODIFICAÇÃO (REGRA 1) +++
+
+
+            // Se o monstro foi derrotado
             if (!monstro.estaVivo()) {
                 System.out.println(jogador.getNome() + " derrotou " + monstro.getNome() + "!");
-                celulaDestino.limparEntidade();
+                celulaDestino.limparEntidade(); // Limpa o monstro
                 
-                // Se o jogador usou o escudo de troca, ele pode trocar de lugar
-                // (Aqui você adicionaria a lógica do escudo de troca)
-                // if (jogador.isEscudoDeTrocaAtivo()) { ... }
+                // +++ INÍCIO MODIFICAÇÃO (REGRA 2: Movimento pós-vitória) +++
+                System.out.println(jogador.getNome() + " toma a posição do monstro!");
+                
+                // (Esta é a mesma lógica de movimento da secção "else" abaixo)
+                celulaDestino.setEntidade(jogador); // Coloca o jogador na nova célula
+                celulaAtual.limparEntidade();       // Limpa o jogador da célula antiga
+                this.posicaoJogador = proximaPosicao; // ATUALIZA a posição do jogador
+                // +++ FIM MODIFICAÇÃO (REGRA 2) +++
             }
             
             // Se o monstro AINDA ESTÁ VIVO, o jogador NÃO se move.
-            // A interação do turno acaba aqui.
+            // (Não alterámos isto)
             
         } else {
-            // 3. Célula livre, move o jogador
-            celulaDestino.setEntidade(jogador); // Coloca o jogador na nova célula
-            celulaAtual.limparEntidade();       // Limpa o jogador da célula antiga
-            this.posicaoJogador = proximaPosicao; // ATUALIZA a posição do jogador
+            // 3. Célula livre, move o jogador (Lógica normal de movimento)
+            celulaDestino.setEntidade(jogador); 
+            celulaAtual.limparEntidade();       
+            this.posicaoJogador = proximaPosicao; 
             System.out.println(jogador.getNome() + " se moveu para a posição " + proximaPosicao);
         }
         
-        // Decrementa buffs do jogador (como o escudo)
-        jogador.decrementarDuracaoBuffs(); //
+        jogador.decrementarDuracaoBuffs();
     }
     
     /**
