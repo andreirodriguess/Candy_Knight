@@ -18,7 +18,7 @@ public class TelaInicial extends JPanel{
     public TelaInicial(int largura,int altura,ControleJanela janela){
         this.setLayout(null);
         this.setPreferredSize(new Dimension(largura,altura));
-        this.setBackground(Color.LIGHT_GRAY);
+        this.setBackground(Color.DARK_GRAY);
         
         //Adicionar Título
             JLabel texto = new JLabel("Candy Knight", SwingConstants.CENTER);
@@ -41,7 +41,7 @@ public class TelaInicial extends JPanel{
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Botão Start Pressionado!");
-                janela.telaJogo();
+                janela.telaDoJogo();
                 }
             });
             this.add(buttonStart);

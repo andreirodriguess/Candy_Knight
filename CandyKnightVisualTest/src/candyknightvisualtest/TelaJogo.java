@@ -10,8 +10,8 @@ import javax.imageio.ImageIO;
 // 1. Adicionamos "implements KeyListener" aqui
 public class TelaJogo extends JPanel implements KeyListener {
     
-    private Image imagemJogador;
-    
+    private Image sprite;
+    private ArquivosImagem arquivoImagem = new ArquivosImagem();
     //------CONSTRUTOR - INICIALIZAR PAINEL E CARREGAR AS IMAGENS QUE SERÃO UTILIZADAS----------------------------------------------------------------------
 
     public TelaJogo(int largura, int altura) {
@@ -19,12 +19,7 @@ public class TelaJogo extends JPanel implements KeyListener {
         this.setBackground(Color.DARK_GRAY);
         this.setPreferredSize(new Dimension(largura, altura));
 
-        try {
-            imagemJogador = ImageIO.read(getClass().getResource("/Imagens/player.png"));    
-        } catch (IOException | IllegalArgumentException e) {
-             // Adicionei IllegalArgumentException pois se a pasta estiver errada, o getResource retorna null
-            System.err.println("Erro ao carregar imagem (verifique se a pasta 'Imagens' está correta em Source Packages): " + e.getMessage());
-        }
+        this.sprite = this.getImage(arquivoImagem.cavaleiro);
         
         // NOVO: Calcula e define a posição do grid e do jogador
         this.SetGridPos(largura,altura);
@@ -39,24 +34,36 @@ public class TelaJogo extends JPanel implements KeyListener {
         this.addKeyListener(this);
         
     }
-
+    public Image getImage(String nomeDaImagem){
+        Image imagem;
+        
+        try {
+            imagem = ImageIO.read(getClass().getResource(nomeDaImagem));
+            return imagem;
+        } catch (IOException | IllegalArgumentException e) {
+             // Adicionei IllegalArgumentException pois se a pasta estiver errada, o getResource retorna null
+            System.err.println("Erro ao carregar imagem (verifique se a pasta 'Imagens' está correta em Source Packages): " + e.getMessage());
+        }
+        
+        return null;
+    }
     //------ATUALIZAR GRID DO JOGO E PINTAR A TELA----------------------------------------------------------------------
     //Variaveis da entidade:
     private int xJogador;
     private int yJogador;
     private int IndiceJogador;
     
-    private int larguraJogador = 128;
-    private int alturaJogador = 128;
+    private int larguraJogador = 70;
+    private int alturaJogador = 100;
     private int passo = 10;//Passo no qual um card do grid se move
     
     //Definir posições do grid
-    int gridSize = 3;
+    int gridSize = 4;
+    int gridGap = 30;
+    int cardLargura = 70;
+    int cardAltura = 100;
     int gridX;
     int gridY;
-    int gridGap = 64;
-    int cardLargura = 128;
-    int cardAltura = 128;
     
     
     
@@ -100,8 +107,8 @@ public class TelaJogo extends JPanel implements KeyListener {
             }
         }
         //Pintar o Player
-            if (imagemJogador != null) {
-                g2d.drawImage(imagemJogador, xJogador, yJogador, larguraJogador, alturaJogador, this);
+            if (this.sprite != null) {
+                g2d.drawImage(this.sprite, xJogador, yJogador, larguraJogador, alturaJogador, this);
             }else {
                 g2d.setColor(Color.RED);
                 g2d.fillRect(xJogador, yJogador, larguraJogador, alturaJogador);
@@ -124,6 +131,7 @@ public class TelaJogo extends JPanel implements KeyListener {
         yJogador = Y;
         repaint();
     }
+    
     public int getPosXFromCard(int Card){
         //posicao No Grid:
         int posXGrid = (int)(Card/this.gridSize);
@@ -144,6 +152,7 @@ public class TelaJogo extends JPanel implements KeyListener {
             
         return posYPainel;
     }
+    
     public boolean validarIndiceCard(int Card){
         int numeroDeCards = this.gridSize*this.gridSize;
         if (Card<0 || (Card>numeroDeCards - 1)){
@@ -151,6 +160,7 @@ public class TelaJogo extends JPanel implements KeyListener {
         }
         return true;
     }
+    
     public int getLinhaFromCard(int Card){
         int linha = (int)(Card%this.gridSize);
         return linha;

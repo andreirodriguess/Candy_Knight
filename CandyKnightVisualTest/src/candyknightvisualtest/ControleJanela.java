@@ -46,4 +46,22 @@ public class ControleJanela extends JFrame {
         
     }
     
+    public void telaDoJogo(){
+        TelaDoJogo jogoPainel = new TelaDoJogo(resolucaoLargura,resolucaoAltura);
+        this.setContentPane(jogoPainel);
+        
+        // Atualiza a visualização
+        this.revalidate();
+        this.repaint();
+        
+        // Passa o foco para o painel do jogo (importante para teclado)
+        jogoPainel.requestFocusInWindow();
+        
+    }
+    
+    public void telaDoJogo2(){
+      
+        
+    }
+    
 }
