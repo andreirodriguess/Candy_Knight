@@ -4,7 +4,8 @@ package candyknightvisualtest;
 import javax.swing.JFrame;
 import java.awt.Dimension;
 
-public class ControleJanela2 {
+
+public class ControleJanela2 extends JFrame{
 
     private JFrame janela;
     private final int LARGURA = 800;

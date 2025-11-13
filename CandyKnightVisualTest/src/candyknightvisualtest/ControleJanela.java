@@ -54,7 +54,6 @@ public class ControleJanela extends JFrame {
         this.revalidate();
         this.repaint();
         
-        // Passa o foco para o painel do jogo (importante para teclado)
         jogoPainel.requestFocusInWindow();
         
     }
