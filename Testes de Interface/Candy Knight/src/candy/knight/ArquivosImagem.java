@@ -7,12 +7,8 @@ import javax.imageio.ImageIO;
 
 public class ArquivosImagem {
     
-    public Image cavaleiro(){
-        return this.getImage("/Imagens/player.png");
-    }
-    public Image ursoDeGoma(){
-        return this.getImage("/Imagens/ursoDeGoma.png");
-    }
+    public Image ursoDeGoma = this.getImage("/Imagens/ursoDeGoma.png");
+    public Image cavaleiro = this.getImage("/Imagens/player.png");
     
     
     public Image getImage(String nomeDaImagem){
