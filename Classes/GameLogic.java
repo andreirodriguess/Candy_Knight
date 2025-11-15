@@ -306,6 +306,8 @@ public class GameLogic {
     }
     
     private boolean processarInteracao(int proximaPosicao, int posicaoAntiga) {
+        
+        
         if (proximaPosicao < 0 || proximaPosicao >= TAMANHO_TABULEIRO) {
             System.out.println("Movimento inválido.");
             return false; // +++ MUDANÇA +++
@@ -315,6 +317,13 @@ public class GameLogic {
         Celula celulaDestino = tabuleiro.get(proximaPosicao);
 
         Cavaleiro jogador = (Cavaleiro) celulaAtual.getEntidade();
+        
+        // STATS
+            System.out.printf("Vida do jogador: %d/%d", jogador.getPontosDeVidaAtuais(), jogador.pontosDeVidaMax());
+            System.out.printf("\nDano do jogador: %d", jogador.getPotencia());
+            System.out.printf("\nPossui arma?: %s", jogador.getArmado());
+            System.out.println("\n");
+        //
 
         // 1. Interage com item na célula de destino
         if (celulaDestino.temItem()) {
@@ -322,18 +331,28 @@ public class GameLogic {
             System.out.println(jogador.getNome() + " encontrou e usou " + item.getNome() + "!");
             item.usar(jogador);
             celulaDestino.limparItem(); 
+            
+            // STATS
+            System.out.printf("\nVida do jogador: %d/%d", jogador.getPontosDeVidaAtuais(), jogador.pontosDeVidaMax());
+            System.out.printf("\nDano do jogador: %d", jogador.getPotencia());
+            System.out.printf("\nPossui arma?: %s", jogador.getArmado());
+            System.out.println("\n");
+        //
         }
 
         // 2. Interage com entidade (monstro) na célula de destino
         if (celulaDestino.temEntidade()) {
             EntidadeJogo monstro = celulaDestino.getEntidade();
+            
+            System.out.println("Logs de monstro encontrado:\n");
+            
             System.out.println(jogador.getNome() + " encontra " + monstro.getNome() + "!");
             
             if (jogador.getArmado()) {
                 System.out.println(jogador.getNome() + " está armado e ataca!");
-                jogador.atacar(monstro);
+                
             } else {
-                System.out.println(jogador.getNome() + " está desarmado e não pode atacar!");
+                System.out.println(jogador.getNome() + " está desarmado e não pode atacar sem receber dano!");
             }
 
             if (monstro.estaVivo()) {
@@ -345,6 +364,20 @@ public class GameLogic {
                 }
             }
 
+            // Bug corrigido do jogador só poder atacar com arma, sem arma ele ataca e o monstro ataca também
+            jogador.atacar(monstro);
+            
+            // STATS APÓS LUTA
+            System.out.printf("\nVida do jogador: %d/%d", jogador.getPontosDeVidaAtuais(), jogador.pontosDeVidaMax());
+            System.out.printf("\nDano do jogador: %d", jogador.getPotencia());
+            System.out.printf("\nPossui arma?: %s", jogador.getArmado());
+            System.out.println("\n");
+            
+            System.out.printf("Vida do monstro: %d/%d", monstro.getPontosDeVidaAtuais(), monstro.pontosDeVidaMax());
+            System.out.printf("\nDano do monstro: %d", monstro.getPotencia());
+            System.out.println("\n");
+            //
+            
             if (!monstro.estaVivo()) {
                 System.out.println(jogador.getNome() + " derrotou " + monstro.getNome() + "!");
                 celulaDestino.limparEntidade(); 
