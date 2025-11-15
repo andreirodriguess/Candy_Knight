@@ -143,6 +143,39 @@ public class GameLogic {
                 return new EscudoDeGoma();
         }
     }
+    
+    private void gerarConteudoAleatorio(Celula celula) {
+        System.out.println("funcao foi chamada(debugging");
+
+        // Gera um número aleatório entre 0 e 4 (total de 5 resultados)
+        int tipoSpawn = random.nextInt(5); 
+
+        switch (tipoSpawn) {
+            case 0: // 40% de chance (Casos 0 e 1)
+            case 1:
+                // SPAWN MONSTRO
+                celula.setEntidade(getMonstroAleatorio());
+                celula.limparItem(); // Garante que não tem item
+                System.out.println("...um Monstro apareceu na borda!");
+                break;
+                
+            case 2: // 40% de chance (Casos 2 e 3)
+            case 3:
+                // SPAWN ITEM
+                celula.setItem(getItemAleatorio());
+                celula.limparEntidade(); // Garante que não tem monstro
+                System.out.println("...um Item apareceu na borda!");
+                break;
+                
+            case 4: // 20% de chance (Caso 4)
+            default:
+                // SPAWN VAZIO
+                celula.limparEntidade();
+                celula.limparItem();
+                System.out.println("...a borda veio vazia.");
+                break;
+        }
+    }
 
 
     // ... (O resto da classe 'GameLogic.java' continua aqui) ...
@@ -245,9 +278,13 @@ public class GameLogic {
                     celulaDestinoPuxada.setEntidade(entidadeOposta);
                     celulaDestinoPuxada.setItem(itemOposto);
 
-                    // Limpa a célula oposta
+                    // --- CORREÇÃO ---
+                    // Limpa a célula oposta ANTES de gerar novo conteúdo
                     celulaOposta.limparEntidade();
                     celulaOposta.limparItem();
+                    // --- FIM DA CORREÇÃO ---
+                    
+                    gerarConteudoAleatorio(celulaOposta); // Agora geras na célula limpa
                     
                     System.out.println("Célula " + posicaoOposta + " foi puxada para a posição " + posAtual);
                     
