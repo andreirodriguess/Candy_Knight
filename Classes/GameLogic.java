@@ -146,7 +146,6 @@ public class GameLogic {
     }
     
     private void gerarConteudoAleatorio(Celula celula) {
-        System.out.println("funcao foi chamada(debugging");
 
         // Gera um número aleatório entre 0 e 4 (total de 5 resultados)
         int tipoSpawn = random.nextInt(5); 
@@ -320,7 +319,7 @@ public class GameLogic {
         Cavaleiro jogador = (Cavaleiro) celulaAtual.getEntidade();
         
         // STATS
-            System.out.printf("Vida do jogador: %d/%d", jogador.getPontosDeVidaAtuais(), jogador.pontosDeVidaMax());
+            System.out.printf("Vida do jogador: %d/%d",jogador.getPontosDeVidaAtuais(), jogador.getPontosDeVidaMax());
             System.out.printf("\nDano do jogador: %d", jogador.getPotencia());
             System.out.printf("\nPossui arma?: %s", jogador.getArmado());
             if (jogador.getArmado()) {
@@ -337,7 +336,7 @@ public class GameLogic {
             celulaDestino.limparItem(); 
             
             // STATS
-            System.out.printf("\nVida do jogador: %d/%d", jogador.getPontosDeVidaAtuais(), jogador.pontosDeVidaMax());
+            System.out.printf("\nVida do jogador: %d/%d", jogador.getPontosDeVidaAtuais(), jogador.getPontosDeVidaMax());
             System.out.printf("\nDano do jogador: %d", jogador.getPotencia());
             System.out.printf("\nPossui arma?: %s", jogador.getArmado());
             if (jogador.getArmado()) {
@@ -378,7 +377,7 @@ public class GameLogic {
             jogador.decrementarDurabilidadeArma();
             
             // STATS APÓS LUTA
-            System.out.printf("\nVida do jogador: %d/%d", jogador.getPontosDeVidaAtuais(), jogador.pontosDeVidaMax());
+            System.out.printf("\nVida do jogador: %d/%d", jogador.getPontosDeVidaAtuais(), jogador.getPontosDeVidaMax());
             System.out.printf("\nDano do jogador: %d", jogador.getPotencia());
             System.out.printf("\nPossui arma?: %s", jogador.getArmado());
             if (jogador.getArmado()) {
@@ -386,7 +385,7 @@ public class GameLogic {
             }
             System.out.println("\n");
             
-            System.out.printf("Vida do monstro: %d/%d", monstro.getPontosDeVidaAtuais(), monstro.pontosDeVidaMax());
+            System.out.printf("Vida do monstro: %d/%d", monstro.getPontosDeVidaAtuais(), monstro.getPontosDeVidaMax());
             System.out.println("\n");
             //
             

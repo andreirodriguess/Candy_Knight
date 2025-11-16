@@ -43,7 +43,7 @@ public abstract class EntidadeJogo {
 
     public String getNome() { return nome; }
     public int getPontosDeVidaAtuais() { return pontosDeVidaAtuais; }
-    public int pontosDeVidaMax() { return pontosDeVidaMax;}
+    public int getPontosDeVidaMax() { return pontosDeVidaMax;}
     public int getPotencia() { return potencia; }
     public boolean estaVivo() { return this.pontosDeVidaAtuais > 0; }
     // ... (depois dos seus métodos get)

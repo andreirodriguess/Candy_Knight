@@ -14,7 +14,6 @@ public class CandyKnight {
          ControleJanela game = new ControleJanela();
          
          game.start();
-         
     };
 
 }
