@@ -131,16 +131,17 @@ public class GameLogic {
      */
     private Coletavel getItemAleatorio() {
         // Gera um número aleatório entre 0, 1 ou 2
-        int tipoItem = random.nextInt(3); 
+        int tipoItem = random.nextInt(2); 
         
         switch (tipoItem) {
             case 0:
                 return new PocaoDeCalda();
             case 1:
-                return new EspadaDeAlcacuz(); // A "arma"
-            case 2:
             default:
-                return new EscudoDeGoma();
+                return new EspadaDeAlcacuz(); // A "arma"
+//            case 2:
+//            default:
+//                return new EscudoDeGoma();
         }
     }
     
@@ -322,6 +323,9 @@ public class GameLogic {
             System.out.printf("Vida do jogador: %d/%d", jogador.getPontosDeVidaAtuais(), jogador.pontosDeVidaMax());
             System.out.printf("\nDano do jogador: %d", jogador.getPotencia());
             System.out.printf("\nPossui arma?: %s", jogador.getArmado());
+            if (jogador.getArmado()) {
+                System.out.printf("\nUsos: %d", jogador.getDurabilidadeArma());
+            }
             System.out.println("\n");
         //
 
@@ -336,6 +340,9 @@ public class GameLogic {
             System.out.printf("\nVida do jogador: %d/%d", jogador.getPontosDeVidaAtuais(), jogador.pontosDeVidaMax());
             System.out.printf("\nDano do jogador: %d", jogador.getPotencia());
             System.out.printf("\nPossui arma?: %s", jogador.getArmado());
+            if (jogador.getArmado()) {
+                System.out.printf("\nUsos: %d", jogador.getDurabilidadeArma());
+            }
             System.out.println("\n");
         //
         }
@@ -355,6 +362,8 @@ public class GameLogic {
                 System.out.println(jogador.getNome() + " está desarmado e não pode atacar sem receber dano!");
             }
 
+            
+            
             if (monstro.estaVivo()) {
                 if (!jogador.getArmado()) {
                     System.out.println(monstro.getNome() + " revida o encontro!");
@@ -366,11 +375,15 @@ public class GameLogic {
 
             // Bug corrigido do jogador só poder atacar com arma, sem arma ele ataca e o monstro ataca também
             jogador.atacar(monstro);
+            jogador.decrementarDurabilidadeArma();
             
             // STATS APÓS LUTA
             System.out.printf("\nVida do jogador: %d/%d", jogador.getPontosDeVidaAtuais(), jogador.pontosDeVidaMax());
             System.out.printf("\nDano do jogador: %d", jogador.getPotencia());
             System.out.printf("\nPossui arma?: %s", jogador.getArmado());
+            if (jogador.getArmado()) {
+                System.out.printf("\nUsos: %d", jogador.getDurabilidadeArma());
+            }
             System.out.println("\n");
             
             System.out.printf("Vida do monstro: %d/%d", monstro.getPontosDeVidaAtuais(), monstro.pontosDeVidaMax());

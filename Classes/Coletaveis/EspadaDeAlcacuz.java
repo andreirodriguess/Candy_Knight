@@ -12,9 +12,11 @@ import candyknight.Entidades.*;
 public class EspadaDeAlcacuz implements Coletavel {
     
     private int novoAtaque;
+    private int durabilidadeConcedida;
 
     public EspadaDeAlcacuz() {
         this.novoAtaque = 25;
+        this.durabilidadeConcedida = 3; // A espada terá 3 usos
     }
     
     public String getNome() {
@@ -29,6 +31,8 @@ public class EspadaDeAlcacuz implements Coletavel {
 
         cavaleiro.setPotencia(this.novoAtaque);
 
+        cavaleiro.setDurabilidadeArma(this.durabilidadeConcedida);
+        
         System.out.println("Ataque aumentado para " + this.novoAtaque + "!");
     }
 }
