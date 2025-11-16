@@ -12,11 +12,10 @@ import candyknight.Entidades.*;
 public class EspadaDeAlcacuz implements Coletavel {
     
     private int novoAtaque;
-    private int durabilidadeConcedida;
 
     public EspadaDeAlcacuz() {
-        this.novoAtaque = 25;
-        this.durabilidadeConcedida = 3; // A espada terá 3 usos
+        // Este valor (25) agora representa o "Pool de Dano Total" da arma.
+        this.novoAtaque = 25; 
     }
     
     public String getNome() {
@@ -29,10 +28,10 @@ public class EspadaDeAlcacuz implements Coletavel {
         
         cavaleiro.setArmado(true);
 
+        // Define a 'potencia' do cavaleiro como o 'pool de dano' da arma
         cavaleiro.setPotencia(this.novoAtaque);
-
-        cavaleiro.setDurabilidadeArma(this.durabilidadeConcedida);
         
-        System.out.println("Ataque aumentado para " + this.novoAtaque + "!");
+        // Mensagem atualizada para refletir a nova mecânica
+        System.out.println("Arma com " + this.novoAtaque + " pontos de dano totais!");
     }
 }

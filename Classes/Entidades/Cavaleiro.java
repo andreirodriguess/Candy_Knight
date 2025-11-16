@@ -18,13 +18,9 @@ public class Cavaleiro extends EntidadeJogo {
     private int duracaoEscudo;
     
     private int potenciaBase; // Guarda o dano original (15)
-    private int durabilidadeArma;
-
-    public int getDurabilidadeArma() {
-        return durabilidadeArma;
-    }
 
     public Cavaleiro(String nome) {
+        // O valor 15 aqui é o dano base (desarmado), que usaremos na lógica de 'desarmado'
         super(nome, 100, 15);
         this.dinheiro = 0;
         
@@ -32,15 +28,37 @@ public class Cavaleiro extends EntidadeJogo {
         this.escudoDeTrocaAtivo = false;
         this.duracaoEscudo = 0;
         
-        this.potenciaBase = this.getPotencia(); // Guarda o valor 15
-        this.durabilidadeArma = 0; // Começa com 0 (desarmado)
+        this.potenciaBase = this.getPotencia(); // Guarda o valor 15 (dano desarmado)
     }
 
     public void atacar(EntidadeJogo alvo) {
         if (!alvo.estaVivo()) return;
 
+        // Esta lógica só é chamada se o jogador está ARMADO (controlado pela GameLogic)
         System.out.println(this.getNome() + " ataca " + alvo.getNome() + " com sua Espada Doce!");
-        alvo.receberDano(this.getPotencia());
+
+        // Lógica de "Pool de Dano"
+        int danoDisponivel = this.getPotencia(); // Este é o 'pool' da arma
+        int vidaMonstro = alvo.getPontosDeVidaAtuais();
+
+        // O dano a causar é o MENOR entre o 'pool' da arma e a 'vida' do monstro
+        int danoACausar = Math.min(danoDisponivel, vidaMonstro);
+
+        alvo.receberDano(danoACausar);
+
+        // Reduz o 'pool' de dano (que está guardado na 'potencia')
+        int poolRestante = danoDisponivel - danoACausar;
+        this.setPotencia(poolRestante);
+
+        // Verifica se a arma 'quebrou' (pool esgotado)
+        if (poolRestante <= 0) {
+            System.out.println("A arma perdeu todo o seu poder!");
+            this.setArmado(false);
+            this.setPotencia(this.potenciaBase); // Reseta para o dano base desarmado
+            System.out.println(this.getNome() + " está desarmado! Potência revertida para " + this.potenciaBase + ".");
+        } else {
+            System.out.println("Pontos de dano restantes na arma: " + poolRestante);
+        }
     }
 
     public void morrer() {
@@ -85,29 +103,5 @@ public class Cavaleiro extends EntidadeJogo {
      */
     public boolean isEscudoDeTrocaAtivo() {
         return this.escudoDeTrocaAtivo;
-    }
-    
-    public void setDurabilidadeArma(int durabilidade) {
-        this.durabilidadeArma = durabilidade;
-        System.out.println("A espada parece ter " + this.durabilidadeArma + " usos restantes.");
-    }
-    
-    public void decrementarDurabilidadeArma() {
-        // Só faz sentido decrementar se o jogador está armado
-        if (this.getArmado()) {
-            
-            this.durabilidadeArma--; // Reduz um uso
-            
-            if (this.durabilidadeArma <= 0) {
-                // A arma quebrou!
-                System.out.println("A Espada de Alcaçuz se quebrou com o impacto!");
-                this.setArmado(false); // Jogador está desarmado
-                this.setPotencia(this.potenciaBase); // Reverte para o dano base (15)
-                System.out.println(this.getNome() + " está desarmado! Ataque revertido para " + this.potenciaBase + ".");
-            } else {
-                // A arma ainda está boa
-                System.out.println("Usos restantes da espada: " + this.durabilidadeArma);
-            }
-        }
     }
 }

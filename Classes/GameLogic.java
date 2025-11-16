@@ -318,13 +318,10 @@ public class GameLogic {
 
         Cavaleiro jogador = (Cavaleiro) celulaAtual.getEntidade();
         
-        // STATS
+        // STATS ANTES DA AÇÃO
             System.out.printf("Vida do jogador: %d/%d",jogador.getPontosDeVidaAtuais(), jogador.getPontosDeVidaMax());
-            System.out.printf("\nDano do jogador: %d", jogador.getPotencia());
+            System.out.printf("\nDano/Pool do jogador: %d", jogador.getPotencia());
             System.out.printf("\nPossui arma?: %s", jogador.getArmado());
-            if (jogador.getArmado()) {
-                System.out.printf("\nUsos: %d", jogador.getDurabilidadeArma());
-            }
             System.out.println("\n");
         //
 
@@ -335,13 +332,10 @@ public class GameLogic {
             item.usar(jogador);
             celulaDestino.limparItem(); 
             
-            // STATS
+            // STATS PÓS-ITEM
             System.out.printf("\nVida do jogador: %d/%d", jogador.getPontosDeVidaAtuais(), jogador.getPontosDeVidaMax());
-            System.out.printf("\nDano do jogador: %d", jogador.getPotencia());
+            System.out.printf("\nDano/Pool do jogador: %d", jogador.getPotencia());
             System.out.printf("\nPossui arma?: %s", jogador.getArmado());
-            if (jogador.getArmado()) {
-                System.out.printf("\nUsos: %d", jogador.getDurabilidadeArma());
-            }
             System.out.println("\n");
         //
         }
@@ -355,34 +349,36 @@ public class GameLogic {
             System.out.println(jogador.getNome() + " encontra " + monstro.getNome() + "!");
             
             if (jogador.getArmado()) {
+                // --- NOVA LÓGICA ARMADO ---
                 System.out.println(jogador.getNome() + " está armado e ataca!");
-                
-            } else {
-                System.out.println(jogador.getNome() + " está desarmado e não pode atacar sem receber dano!");
-            }
+                // Chama a nova lógica de 'atacar' do Cavaleiro (que usa o 'pool')
+                jogador.atacar(monstro); 
+                System.out.println(monstro.getNome() + " fica intimidado e não revida!");
 
-            
-            
-            if (monstro.estaVivo()) {
-                if (!jogador.getArmado()) {
-                    System.out.println(monstro.getNome() + " revida o encontro!");
-                    monstro.atacar(jogador);
-                } else {
-                    System.out.println(monstro.getNome() + " fica intimidado pela arma do jogador!");
+            } else {
+                // --- NOVA LÓGICA DESARMADO ---
+                // O jogador "paga" com vida para derrotar o monstro e avançar
+                System.out.println(jogador.getNome() + " está desarmado e avança destemidamente!");
+                int vidaMonstro = monstro.getPontosDeVidaAtuais();
+                System.out.println(monstro.getNome() + " tem " + vidaMonstro + " pontos de vida.");
+                System.out.println(jogador.getNome() + " recebe " + vidaMonstro + " de dano para derrotá-lo!");
+                
+                jogador.receberDano(vidaMonstro);
+
+                // Se o jogador sobreviveu, o monstro é derrotado
+                if (jogador.estaVivo()) {
+                    monstro.setPontosDeVidaAtuais(0); // Força a morte do monstro
+                    // monstro.morrer() será chamado na verificação '!monstro.estaVivo()'
+                }
+                else {
+                    System.out.println("O dano foi fatal!");
                 }
             }
-
-            // Bug corrigido do jogador só poder atacar com arma, sem arma ele ataca e o monstro ataca também
-            jogador.atacar(monstro);
-            jogador.decrementarDurabilidadeArma();
             
             // STATS APÓS LUTA
             System.out.printf("\nVida do jogador: %d/%d", jogador.getPontosDeVidaAtuais(), jogador.getPontosDeVidaMax());
-            System.out.printf("\nDano do jogador: %d", jogador.getPotencia());
+            System.out.printf("\nDano/Pool do jogador: %d", jogador.getPotencia());
             System.out.printf("\nPossui arma?: %s", jogador.getArmado());
-            if (jogador.getArmado()) {
-                System.out.printf("\nUsos: %d", jogador.getDurabilidadeArma());
-            }
             System.out.println("\n");
             
             System.out.printf("Vida do monstro: %d/%d", monstro.getPontosDeVidaAtuais(), monstro.getPontosDeVidaMax());
@@ -392,18 +388,23 @@ public class GameLogic {
             if (!monstro.estaVivo()) {
                 System.out.println(jogador.getNome() + " derrotou " + monstro.getNome() + "!");
                 celulaDestino.limparEntidade(); 
-                
-                System.out.println(jogador.getNome() + " toma a posição do monstro!");
-                
-                celulaDestino.setEntidade(jogador); 
-                celulaAtual.limparEntidade();       
-                this.posicaoJogador = proximaPosicao; // ATUALIZA a posição do jogador
-                
-                return true; // +++ MUDANÇA: Jogador moveu-se +++
+
+                // Verifica se o jogador sobreviveu à interação (relevante para 'desarmado')
+                if (jogador.estaVivo()) {
+                    System.out.println(jogador.getNome() + " toma a posição do monstro!");
+                    celulaDestino.setEntidade(jogador); 
+                    celulaAtual.limparEntidade();       
+                    this.posicaoJogador = proximaPosicao; // ATUALIZA a posição do jogador
+                    return true; // Jogador moveu-se
+                } else {
+                    System.out.println("...mas não sobreviveu ao encontro.");
+                    // Jogador está morto, não se move.
+                    return false;
+                }
             } else {
-                // +++ MUDANÇA: Monstro está vivo, jogador não se moveu +++
+                // Monstro está vivo (só acontece se armado e o pool não foi suficiente)
                 System.out.println(jogador.getNome() + " não pode avançar!");
-                return false; 
+                return false; // Jogador não se moveu
             }
             
         } else {
