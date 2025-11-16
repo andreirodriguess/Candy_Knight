@@ -17,40 +17,34 @@ public class Cavaleiro extends EntidadeJogo {
     private boolean escudoDeTrocaAtivo;
     private int duracaoEscudo;
     
-    private int potenciaBase; // Guarda o dano original (15)
+    private int potenciaBase; // Guarda o dano original
 
     public Cavaleiro(String nome) {
-        // O valor 15 aqui é o dano base (desarmado), que usaremos na lógica de 'desarmado'
-        super(nome, 100, 15);
+        // +++ MUDANÇA: Vida 100 -> 10, Dano base 15 -> 1 +++
+        super(nome, 10, 1);
         this.dinheiro = 0;
         
-        // Inicializa os novos campos
         this.escudoDeTrocaAtivo = false;
         this.duracaoEscudo = 0;
         
-        this.potenciaBase = this.getPotencia(); // Guarda o valor 15 (dano desarmado)
+        this.potenciaBase = this.getPotencia(); // Guarda o valor 1 (dano desarmado)
     }
 
     public void atacar(EntidadeJogo alvo) {
         if (!alvo.estaVivo()) return;
 
-        // Esta lógica só é chamada se o jogador está ARMADO (controlado pela GameLogic)
         System.out.println(this.getNome() + " ataca " + alvo.getNome() + " com sua Espada Doce!");
 
-        // Lógica de "Pool de Dano"
-        int danoDisponivel = this.getPotencia(); // Este é o 'pool' da arma
+        int danoDisponivel = this.getPotencia(); 
         int vidaMonstro = alvo.getPontosDeVidaAtuais();
 
-        // O dano a causar é o MENOR entre o 'pool' da arma e a 'vida' do monstro
         int danoACausar = Math.min(danoDisponivel, vidaMonstro);
 
         alvo.receberDano(danoACausar);
 
-        // Reduz o 'pool' de dano (que está guardado na 'potencia')
         int poolRestante = danoDisponivel - danoACausar;
         this.setPotencia(poolRestante);
 
-        // Verifica se a arma 'quebrou' (pool esgotado)
         if (poolRestante <= 0) {
             System.out.println("A arma perdeu todo o seu poder!");
             this.setArmado(false);

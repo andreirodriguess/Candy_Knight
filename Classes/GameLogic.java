@@ -26,11 +26,14 @@ public class GameLogic {
 
     // +++ NOVO: Gerador de números aleatórios +++
     private Random random;
+    
+    // +++ NOVO: Controle de dificuldade +++
+    private int nivelDificuldade;
 
     public GameLogic() {
         this.tabuleiro = new ArrayList<>(TAMANHO_TABULEIRO);
-        // +++ NOVO: Inicializa o gerador aleatório +++
         this.random = new Random(); 
+        this.nivelDificuldade = 0; // Começa no nível 0
         iniciarTabuleiro();
     }
 
@@ -48,13 +51,16 @@ public class GameLogic {
         // 2. Adiciona o jogador (posição 4, o centro)
         tabuleiro.get(4).setEntidade(new candyknight.Entidades.Cavaleiro("Sir Doce"));
         this.posicaoJogador = 4;
+        
+        // +++ NOVO: Reseta a dificuldade no início +++
+        this.nivelDificuldade = 0;
+
 
         // +++ INÍCIO DA NOVA LÓGICA ALEATÓRIA +++
 
         // 3. Define a quantidade de monstros e itens
-        // (Podes alterar estes valores para balancear o jogo)
         int numMonstros = 2;
-        int numItens = 2; // "Quase igual" (neste caso, igual)
+        int numItens = 2; 
 
         // 4. Cria uma lista de posições livres para spawn
         List<Integer> posicoesLivres = new ArrayList<>();
@@ -62,8 +68,6 @@ public class GameLogic {
             posicoesLivres.add(i);
         }
         
-        // Remove a posição do jogador da lista de spawn
-        // Usamos Integer.valueOf() para remover o OBJETO 4, e não o item no ÍNDICE 4.
         posicoesLivres.remove(Integer.valueOf(this.posicaoJogador)); 
 
         // 5. Embaralha a lista de posições livres
@@ -73,10 +77,10 @@ public class GameLogic {
         int monstrosAdicionados = 0;
         while (monstrosAdicionados < numMonstros && !posicoesLivres.isEmpty()) {
             
-            // Pega e remove a primeira posição da lista embaralhada
             int posParaSpawn = posicoesLivres.remove(0); 
             
-            MonstroDoce monstro = getMonstroAleatorio(); // Pega um monstro aleatório
+            // +++ MUDANÇA: Passa o nível de dificuldade (0 no início) +++
+            MonstroDoce monstro = getMonstroAleatorio(this.nivelDificuldade); 
             tabuleiro.get(posParaSpawn).setEntidade(monstro);
             
             monstrosAdicionados++;
@@ -86,13 +90,10 @@ public class GameLogic {
         int itensAdicionados = 0;
         while (itensAdicionados < numItens && !posicoesLivres.isEmpty()) {
             
-            // Pega e remove a próxima posição da lista
             int posParaSpawn = posicoesLivres.remove(0); 
             
-            Coletavel item = getItemAleatorio(); // Pega um item aleatório
-            
-            // (A nossa lógica já garante que um item não cai sobre um monstro,
-            // pois estamos a usar e remover posições da mesma lista 'posicoesLivres')
+            // +++ MUDANÇA: Passa o nível de dificuldade (0 no início) +++
+            Coletavel item = getItemAleatorio(this.nivelDificuldade); 
             
             tabuleiro.get(posParaSpawn).setItem(item);
             
@@ -103,71 +104,69 @@ public class GameLogic {
         // +++ FIM DA NOVA LÓGICA ALEATÓRIA +++
     }
 
-    // +++ NOVO MÉTODO AUXILIAR +++
+    // +++ MÉTODO MODIFICADO: Aceita o nível de dificuldade +++
     /**
-     * Cria e retorna uma instância de um MonstroDoce aleatório.
+     * Cria e retorna uma instância de um MonstroDoce aleatório,
+     * com status ajustados para o nível atual.
+     * @param nivel O nível de dificuldade atual do jogo.
      * @return Um MonstroDoce (Urso, Soldado ou PeDeMolequinho).
      */
-    private MonstroDoce getMonstroAleatorio() {
-        // Gera um número aleatório entre 0, 1 ou 2
+    private MonstroDoce getMonstroAleatorio(int nivel) {
         int tipoMonstro = random.nextInt(3); 
 
         switch (tipoMonstro) {
             case 0:
-                return new UrsoDeGoma();
+                return new UrsoDeGoma(nivel);
             case 1:
-                return new SoldadoGengibre();
+                return new SoldadoGengibre(nivel);
             case 2:
-            default: // 'default' garante que algo é sempre retornado
-                return new PeDeMolequinho();
+            default: 
+                return new PeDeMolequinho(nivel);
         }
     }
     
-    // +++ NOVO MÉTODO AUXILIAR +++
+    // +++ MÉTODO MODIFICADO: Aceita o nível de dificuldade +++
     /**
-     * Cria e retorna uma instância de um Coletavel aleatório.
-     * Isto inclui armas (Espada) e outros itens (Poção, Escudo).
-     * @return Um Coletavel (Pocao, Espada ou Escudo).
+     * Cria e retorna uma instância de um Coletavel aleatório,
+     * com status ajustados para o nível atual.
+     * @param nivel O nível de dificuldade atual do jogo.
+     * @return Um Coletavel (Pocao ou Espada).
      */
-    private Coletavel getItemAleatorio() {
-        // Gera um número aleatório entre 0, 1 ou 2
+    private Coletavel getItemAleatorio(int nivel) {
         int tipoItem = random.nextInt(2); 
         
         switch (tipoItem) {
             case 0:
-                return new PocaoDeCalda();
+                return new PocaoDeCalda(nivel);
             case 1:
             default:
-                return new EspadaDeAlcacuz(); // A "arma"
-//            case 2:
-//            default:
-//                return new EscudoDeGoma();
+                return new EspadaDeAlcacuz(nivel); // A "arma"
         }
     }
     
+    // +++ MÉTODO MODIFICADO: Passa o nível de dificuldade +++
     private void gerarConteudoAleatorio(Celula celula) {
 
-        // Gera um número aleatório entre 0 e 4 (total de 5 resultados)
         int tipoSpawn = random.nextInt(5); 
 
         switch (tipoSpawn) {
-            case 0: // 40% de chance (Casos 0 e 1)
+            case 0: 
             case 1:
-                // SPAWN MONSTRO
-                celula.setEntidade(getMonstroAleatorio());
-                celula.limparItem(); // Garante que não tem item
+                // SPAWN MONSTRO (com dificuldade atual)
+                celula.setEntidade(getMonstroAleatorio(this.nivelDificuldade));
+                celula.limparItem(); 
                 System.out.println("...um Monstro apareceu na borda!");
                 break;
                 
-            case 2: // 40% de chance (Casos 2 e 3)
+            case 2: 
             case 3:
-                // SPAWN ITEM
-                celula.setItem(getItemAleatorio());
-                celula.limparEntidade(); // Garante que não tem monstro
+                // SPAWN ITEM (com dificuldade atual)
+                celula.setItem(getItemAleatorio(this.nivelDificuldade));
+                celula.limparEntidade(); 
                 System.out.println("...um Item apareceu na borda!");
                 break;
                 
-            case 4: // 20% de chance (Caso 4)
+            case 4: 
             default:
                 // SPAWN VAZIO
                 celula.limparEntidade();
@@ -178,17 +177,12 @@ public class GameLogic {
     }
 
 
-    // ... (O resto da classe 'GameLogic.java' continua aqui) ...
-    // (O teu método 'tentarMoverJogador' modificado anteriormente está perfeito
-    // e não precisa ser alterado por esta nova funcionalidade)
-    
     public int tentarMoverJogador(Direcao direcao) {
         int proximaPosicao = -1;
         int posAtual = this.posicaoJogador;
         
-        // +++ MUDANÇA: lógica para encontrar a célula oposta +++
         int posicaoOposta = -1; 
-        boolean opostaValida = false; // Flag para saber se a célula oposta existe
+        boolean opostaValida = false; 
 
         // 1. Calcula a posição de destino e a posição oposta
         switch (direcao) {
@@ -198,8 +192,7 @@ public class GameLogic {
                     return -1; // Falha (borda)
                 }
                 proximaPosicao = posAtual - 3;
-                // Oposto é a célula de BAIXO
-                if (posAtual <= 5) { // Se não está na última linha
+                if (posAtual <= 5) { 
                     posicaoOposta = posAtual + 3;
                     opostaValida = true;
                 }
@@ -211,8 +204,7 @@ public class GameLogic {
                     return -1; // Falha (borda)
                 }
                 proximaPosicao = posAtual + 3;
-                // Oposto é a célula de CIMA
-                if (posAtual >= 3) { // Se não está na primeira linha
+                if (posAtual >= 3) { 
                     posicaoOposta = posAtual - 3;
                     opostaValida = true;
                 }
@@ -224,8 +216,7 @@ public class GameLogic {
                     return -1; // Falha (borda)
                 }
                 proximaPosicao = posAtual - 1;
-                // Oposto é a célula da DIREITA
-                if (posAtual % 3 != 2) { // Se não está na borda direita
+                if (posAtual % 3 != 2) { 
                     posicaoOposta = posAtual + 1;
                     opostaValida = true;
                 }
@@ -237,8 +228,7 @@ public class GameLogic {
                     return -1; // Falha (borda)
                 }
                 proximaPosicao = posAtual + 1;
-                // Oposto é a célula da ESQUERDA
-                if (posAtual % 3 != 0) { // Se não está na borda esquerda
+                if (posAtual % 3 != 0) { 
                     posicaoOposta = posAtual - 1;
                     opostaValida = true;
                 }
@@ -248,13 +238,9 @@ public class GameLogic {
         // 2. Se o cálculo foi bem-sucedido, processa a interação
         if (proximaPosicao != -1) {
             
-            // +++ MUDANÇA: Chamamos a nova processarInteracao() +++
-            // Ela agora nos diz se o jogador realmente mudou de lugar.
             boolean jogadorMoveu = processarInteracao(proximaPosicao, posAtual);
 
-            // Pega o jogador (necessário para decrementar buffs)
-            // Nota: a posição do jogador (this.posicaoJogador) pode ter mudado
-            // dentro de processarInteracao.
+            // Pega o jogador 
             Cavaleiro jogador = (Cavaleiro) tabuleiro.get(this.posicaoJogador).getEntidade();
             if (jogador != null) {
                 jogador.decrementarDuracaoBuffs();
@@ -264,56 +250,55 @@ public class GameLogic {
             // 3. Se o jogador se moveu, executamos a lógica de "puxar"
             if (jogadorMoveu) {
                 
+                // +++ NOVO: Aumenta a dificuldade a cada movimento +++
+                this.nivelDificuldade++;
+                System.out.println("Nível de dificuldade aumentado para: " + this.nivelDificuldade);
+                // +++ FIM DA MUDANÇA +++
+                
                 if (opostaValida) {
-                    // Pega a célula oposta (de onde vamos puxar)
                     Celula celulaOposta = tabuleiro.get(posicaoOposta);
-                    // Pega a célula que o jogador acabou de deixar (para onde vamos puxar)
                     Celula celulaDestinoPuxada = tabuleiro.get(posAtual); 
 
-                    // Pega o que tem na célula oposta
                     EntidadeJogo entidadeOposta = celulaOposta.getEntidade();
                     Coletavel itemOposto = celulaOposta.getItem();
 
-                    // Move para a célula antiga do jogador
                     celulaDestinoPuxada.setEntidade(entidadeOposta);
                     celulaDestinoPuxada.setItem(itemOposto);
 
-                    // --- CORREÇÃO ---
-                    // Limpa a célula oposta ANTES de gerar novo conteúdo
                     celulaOposta.limparEntidade();
                     celulaOposta.limparItem();
-                    // --- FIM DA CORREÇÃO ---
                     
-                    gerarConteudoAleatorio(celulaOposta); // Agora geras na célula limpa
+                    // Gera novo conteúdo (já usando o nívelDificuldade atualizado)
+                    gerarConteudoAleatorio(celulaOposta); 
                     
                     System.out.println("Célula " + posicaoOposta + " foi puxada para a posição " + posAtual);
                     
-                    // Retorna o ID da célula que foi movida
                     return posicaoOposta; 
                 } else {
-                    // O jogador moveu, mas não havia célula oposta válida
                     return -2; // Sucesso, sem "puxar"
                 }
                 
             } else {
-                // O jogador não se moveu (ex: bloqueado por monstro)
                 return -1; // Falha (bloqueado)
             }
         }
         
-        // Se proximaPosicao == -1 (cálculo falhou lá em cima)
         return -1;
     }
+    
+    // O restante do método processarInteracao() permanece igual ao que você forneceu,
+    // pois a lógica de combate (pool de dano, desarmado vs armado) já está correta.
+    // ... (resto da classe) ...
     
     private boolean processarInteracao(int proximaPosicao, int posicaoAntiga) {
         
         
         if (proximaPosicao < 0 || proximaPosicao >= TAMANHO_TABULEIRO) {
             System.out.println("Movimento inválido.");
-            return false; // +++ MUDANÇA +++
+            return false; 
         }
 
-        Celula celulaAtual = tabuleiro.get(posicaoAntiga); // +++ MUDANÇA +++
+        Celula celulaAtual = tabuleiro.get(posicaoAntiga); 
         Celula celulaDestino = tabuleiro.get(proximaPosicao);
 
         Cavaleiro jogador = (Cavaleiro) celulaAtual.getEntidade();
@@ -349,15 +334,11 @@ public class GameLogic {
             System.out.println(jogador.getNome() + " encontra " + monstro.getNome() + "!");
             
             if (jogador.getArmado()) {
-                // --- NOVA LÓGICA ARMADO ---
                 System.out.println(jogador.getNome() + " está armado e ataca!");
-                // Chama a nova lógica de 'atacar' do Cavaleiro (que usa o 'pool')
                 jogador.atacar(monstro); 
                 System.out.println(monstro.getNome() + " fica intimidado e não revida!");
 
             } else {
-                // --- NOVA LÓGICA DESARMADO ---
-                // O jogador "paga" com vida para derrotar o monstro e avançar
                 System.out.println(jogador.getNome() + " está desarmado e avança destemidamente!");
                 int vidaMonstro = monstro.getPontosDeVidaAtuais();
                 System.out.println(monstro.getNome() + " tem " + vidaMonstro + " pontos de vida.");
@@ -365,10 +346,8 @@ public class GameLogic {
                 
                 jogador.receberDano(vidaMonstro);
 
-                // Se o jogador sobreviveu, o monstro é derrotado
                 if (jogador.estaVivo()) {
-                    monstro.setPontosDeVidaAtuais(0); // Força a morte do monstro
-                    // monstro.morrer() será chamado na verificação '!monstro.estaVivo()'
+                    monstro.setPontosDeVidaAtuais(0); 
                 }
                 else {
                     System.out.println("O dano foi fatal!");
@@ -389,32 +368,29 @@ public class GameLogic {
                 System.out.println(jogador.getNome() + " derrotou " + monstro.getNome() + "!");
                 celulaDestino.limparEntidade(); 
 
-                // Verifica se o jogador sobreviveu à interação (relevante para 'desarmado')
                 if (jogador.estaVivo()) {
                     System.out.println(jogador.getNome() + " toma a posição do monstro!");
                     celulaDestino.setEntidade(jogador); 
                     celulaAtual.limparEntidade();       
-                    this.posicaoJogador = proximaPosicao; // ATUALIZA a posição do jogador
+                    this.posicaoJogador = proximaPosicao; 
                     return true; // Jogador moveu-se
                 } else {
                     System.out.println("...mas não sobreviveu ao encontro.");
-                    // Jogador está morto, não se move.
                     return false;
                 }
             } else {
-                // Monstro está vivo (só acontece se armado e o pool não foi suficiente)
                 System.out.println(jogador.getNome() + " não pode avançar!");
                 return false; // Jogador não se moveu
             }
             
         } else {
-            // 3. Célula livre, move o jogador (Lógica normal de movimento)
+            // 3. Célula livre, move o jogador
             celulaDestino.setEntidade(jogador); 
             celulaAtual.limparEntidade();       
             this.posicaoJogador = proximaPosicao; 
             System.out.println(jogador.getNome() + " se moveu para a posição " + proximaPosicao);
             
-            return true; // +++ MUDANÇA: Jogador moveu-se +++
+            return true; // Jogador moveu-se
         }
     }
     

@@ -10,8 +10,17 @@ package candyknight.Entidades;
  */
 public class UrsoDeGoma extends MonstroDoce {
 
-    public UrsoDeGoma() {
-        super("Urso de Goma Grudento", 30, 10);
+    // +++ MUDANÇA: Construtor aceita nível de dificuldade +++
+    public UrsoDeGoma(int nivel) {
+        // +++ MUDANÇA: Valores base reduzidos (30->3, 10->1) +++
+        int vidaBase = 3;
+        int recompensaBase = 1;
+        
+        // +++ MUDANÇA: Lógica de scaling +++
+        // Aumenta a vida em 1 a cada 3 níveis
+        int vidaAjustada = vidaBase + (nivel / 3);
+        
+        super("Urso de Goma Grudento", vidaAjustada, recompensaBase);
     }
 
     public void atacar(EntidadeJogo alvo) {

@@ -13,25 +13,27 @@ public class EspadaDeAlcacuz implements Coletavel {
     
     private int novoAtaque;
 
-    public EspadaDeAlcacuz() {
-        // Este valor (25) agora representa o "Pool de Dano Total" da arma.
-        this.novoAtaque = 25; 
+    // +++ MUDANÇA: Construtor aceita nível de dificuldade +++
+    public EspadaDeAlcacuz(int nivel) {
+        // +++ MUDANÇA: Valor base reduzido (25 -> 2.5 -> 3) +++
+        int ataqueBase = 3; 
+        
+        // +++ MUDANÇA: Lógica de scaling (passo MENOR) +++
+        // Aumenta o pool de dano em 1 a cada 5 níveis
+        this.novoAtaque = ataqueBase + (nivel / 5);
     }
     
     public String getNome() {
         return "Espada de Alcaçuz";
     }
     
-    // Em EspadaDeAlcacuz.java
     public void usar(Cavaleiro cavaleiro) {
         System.out.println(cavaleiro.getNome() + " equipou a " + this.getNome() + "!");
         
         cavaleiro.setArmado(true);
 
-        // Define a 'potencia' do cavaleiro como o 'pool de dano' da arma
         cavaleiro.setPotencia(this.novoAtaque);
         
-        // Mensagem atualizada para refletir a nova mecânica
         System.out.println("Arma com " + this.novoAtaque + " pontos de dano totais!");
     }
 }
