@@ -48,6 +48,7 @@ public class GameLogic {
         // 2. Adiciona o jogador (ex: posição 4, o centro)
         tabuleiro.get(4).setEntidade(new Entidades.Cavaleiro("player"));
         this.posicaoJogador = 4;
+        
 
         // 3. Adiciona monstros (ex: posições 1 e 7)
         tabuleiro.get(1).setEntidade(new Entidades.UrsoDeGoma());

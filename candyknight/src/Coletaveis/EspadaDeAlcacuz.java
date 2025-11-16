@@ -14,11 +14,11 @@ public class EspadaDeAlcacuz implements Coletavel {
     private int novoAtaque;
 
     public EspadaDeAlcacuz() {
-        this.novoAtaque = 25;
+        this.novoAtaque = 5;
     }
     
     public String getNome() {
-        return "Espada de Alcaçuz";
+        return "espadaDeAlcacuz";
     }
     
     // Em EspadaDeAlcacuz.java
@@ -27,6 +27,8 @@ public class EspadaDeAlcacuz implements Coletavel {
         
         cavaleiro.setArmado(true);
 
+        cavaleiro.setArma(this);
+        
         cavaleiro.setPotencia(this.novoAtaque);
 
         System.out.println("Ataque aumentado para " + this.novoAtaque + "!");

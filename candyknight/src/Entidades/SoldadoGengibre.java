@@ -10,7 +10,7 @@ package Entidades;
 public class SoldadoGengibre extends MonstroDoce {
 
     public SoldadoGengibre() {
-        super("Soldado de Gengibre", 50, 8, 20);
+        super("soldadoDeGengibre", 10, 8, 20);
     }
 
     public void atacar(EntidadeJogo alvo) {

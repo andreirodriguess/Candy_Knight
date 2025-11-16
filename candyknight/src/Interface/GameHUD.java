@@ -7,6 +7,7 @@ import Coletaveis.*;
 
 
 import java.awt.Color;
+import java.awt.*;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -73,18 +74,25 @@ public class GameHUD extends JPanel implements KeyListener,ActionListener{
     
     public void mostrarCelulas(Graphics2D g2d){
         this.tabuleiro = this.gameControl.getTabuleiro();
+        Image sprite;
+        
         
         for(int i=0;i<9;i++){
             if(this.tabuleiro.get(i).temEntidade()){
                 //desenhar entidade:
-                Image sprite = this.arquivo.getImage(this.tabuleiro.get(i).getEntidade().getNome());
+                sprite = this.arquivo.getImage(this.tabuleiro.get(i).getEntidade().getNome());
                 X = this.getPosXFromCard(i);
                 Y = this.getPosYFromCard(i);
-                this.desenharImagem(sprite,X,Y,this.sg.tamanhoSprite, g2d);
+                int vidaAtual = this.tabuleiro.get(i).getEntidade().getPontosDeVidaAtuais();
+                this.desenharEntidade(sprite,X,Y, g2d,vidaAtual);
                 
+                //Desenhar arma:
                 if(this.tabuleiro.get(i).getEntidade().getArmado()){
-                    
+                    sprite = this.arquivo.getImage(this.tabuleiro.get(i).getEntidade().getArma().getNome());
+                    int danoDaArma = this.tabuleiro.get(i).getEntidade().getPotencia();
+                    this.desenharArmaNaMao(sprite, X, Y, g2d,danoDaArma);
                 }
+                
             }
         }
     }
@@ -97,6 +105,28 @@ public class GameHUD extends JPanel implements KeyListener,ActionListener{
                 g2d.setColor(Color.ORANGE);
                 g2d.fillRect(X, Y, size, size);
             }
+    }
+    public void desenharEntidade(Image imagemArma,int X,int Y,Graphics2D g2d,int vida){
+        this.desenharImagem(imagemArma, X+(this.sg.cartaLargura-this.sg.tamanhoSprite)/2, Y+(this.sg.cartaAltura-this.sg.tamanhoSprite)/2, this.sg.tamanhoSprite, g2d);
+        
+        //apresentar HP
+        int xHP = X+this.sg.cartaLargura-30;
+        int yHP = Y+20;
+        
+        this.desenharImagem(this.arquivo.heartHP,xHP,yHP , 30, g2d);
+        
+        
+        g2d.setFont(new Font("Arial", Font.BOLD, 15));
+        g2d.setColor(Color.BLACK);
+        g2d.drawString(""+vida, xHP+5,yHP);
+    }
+    public void desenharArmaNaMao(Image imagemArma,int X,int Y,Graphics2D g2d,int dano){
+        this.desenharImagem(imagemArma, X-15, Y+45,(this.sg.tamanhoSprite-this.sg.tamanhoSprite/4), g2d);
+        //Apresentar força da arma que está sendo apresentada
+        g2d.setFont(new Font("Arial", Font.BOLD, 20));
+        g2d.setColor(Color.BLACK);
+        g2d.drawString(""+dano, X+10, Y+this.sg.cartaAltura-10);
+        
     }
     
     public void Mover(int direcao){

@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Entidades;
-
+import Coletaveis.*;
 /**
  *
  * @author felip
@@ -15,6 +15,8 @@ public abstract class EntidadeJogo {
     private int pontosDeVidaAtuais;
     private int potencia; //capacidade de causar dano/curar
     private boolean armado;
+    private Coletavel armaEquipada;
+    
 
     public EntidadeJogo(String nome, int vidaMax, int potencia) {
         this.nome = nome;
@@ -84,5 +86,11 @@ public abstract class EntidadeJogo {
     }
     public void setArmado(boolean estado) {
         this.armado = estado;
+    }
+    public void setArma(Coletavel arma){
+        this.armaEquipada = arma;
+    }
+    public Coletavel getArma(){
+        return armaEquipada;
     }
 }

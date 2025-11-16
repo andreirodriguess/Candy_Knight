@@ -11,7 +11,7 @@ package Entidades;
 public class UrsoDeGoma extends MonstroDoce {
 
     public UrsoDeGoma() {
-        super("ursoDeGoma", 30, 5, 10);
+        super("ursoDeGoma", 6, 5, 10);
     }
 
     public void atacar(EntidadeJogo alvo) {

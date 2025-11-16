@@ -4,6 +4,7 @@
  */
 package Entidades;
 
+import Coletaveis.*;
 /**
  *
  * @author felip
@@ -16,10 +17,14 @@ public class Cavaleiro extends EntidadeJogo {
     // NOVOS CAMPOS PARA O ESCUDO
     private boolean escudoDeTrocaAtivo;
     private int duracaoEscudo;
-
+    private Coletavel armaInicial;
+            
     public Cavaleiro(String nome) {
-        super(nome, 100, 15);
+        super(nome, 10, 15);
         this.dinheiro = 0;
+        
+        armaInicial = new EspadaDeAlcacuz();
+        armaInicial.usar(this);
         
         // Inicializa os novos campos
         this.escudoDeTrocaAtivo = false;

@@ -18,7 +18,7 @@ public class ScreenGame extends JLayeredPane{
     public int gridGap = 30;
     public int cartaAltura = 160;
     public int cartaLargura = 128; 
-    public int tamanhoSprite = 128;
+    public int tamanhoSprite = 100;
     
     
     GameHUD FrontPanel;
