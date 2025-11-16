@@ -12,8 +12,8 @@ public abstract class MonstroDoce extends EntidadeJogo {
 
     private int recompensaEmDinheiro;
 
-    public MonstroDoce(String nome, int vidaMax, int forca, int recompensa) {
-        super(nome, vidaMax, forca);
+    public MonstroDoce(String nome, int vidaMax, int recompensa) {
+        super(nome, vidaMax, 0);
         this.recompensaEmDinheiro = recompensa;
     }
 

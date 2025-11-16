@@ -10,14 +10,14 @@ package candyknight.Entidades;
 public class SoldadoGengibre extends MonstroDoce {
 
     public SoldadoGengibre() {
-        super("Soldado de Gengibre", 50, 8, 20);
+        super("Soldado de Gengibre", 35, 2);
     }
 
     public void atacar(EntidadeJogo alvo) {
         if (!alvo.estaVivo()) return;
         
         System.out.println(this.getNome() + " golpeia com seu bastão de açúcar!");
-        alvo.receberDano(this.getPotencia());
+        alvo.receberDano(this.getPontosDeVidaAtuais());
     }
 
     public void morrer() {

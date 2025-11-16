@@ -15,7 +15,7 @@ public class PeDeMolequinho extends MonstroDoce {
 
     public PeDeMolequinho() {
         // (Nome, VidaFase1, Forca, Recompensa)
-        super("Pé de Molequinho Duro", 60, 10, 30);
+        super("Pé de Molequinho Duro", 15, 3);
         this.vidaFase2 = 40; // Vida total dos dois fragmentos juntos
         this.estaDividido = false;
     }
@@ -29,7 +29,7 @@ public class PeDeMolequinho extends MonstroDoce {
         } else {
             System.out.println(this.getNome() + " ataca com um chute duplo de amendoim!");
         }
-        alvo.receberDano(this.getPotencia());
+        alvo.receberDano(this.getPontosDeVidaAtuais());
     }
 
     /**

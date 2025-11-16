@@ -387,7 +387,6 @@ public class GameLogic {
             System.out.println("\n");
             
             System.out.printf("Vida do monstro: %d/%d", monstro.getPontosDeVidaAtuais(), monstro.pontosDeVidaMax());
-            System.out.printf("\nDano do monstro: %d", monstro.getPotencia());
             System.out.println("\n");
             //
             

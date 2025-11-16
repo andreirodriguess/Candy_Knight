@@ -11,14 +11,14 @@ package candyknight.Entidades;
 public class UrsoDeGoma extends MonstroDoce {
 
     public UrsoDeGoma() {
-        super("Urso de Goma Grudento", 30, 5, 10);
+        super("Urso de Goma Grudento", 30, 10);
     }
 
     public void atacar(EntidadeJogo alvo) {
         if (!alvo.estaVivo()) return;
 
         System.out.println(this.getNome() + " dá uma patada grudenta em " + alvo.getNome() + "!");
-        alvo.receberDano(this.getPotencia());
+        alvo.receberDano(this.getPontosDeVidaAtuais());
     }
 
     public void morrer() {
