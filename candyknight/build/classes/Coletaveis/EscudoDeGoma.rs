@@ -1,0 +1,1 @@
+candyknight.Coletaveis.EscudoDeGoma
