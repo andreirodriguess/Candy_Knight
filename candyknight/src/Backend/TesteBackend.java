@@ -60,6 +60,7 @@ public class TesteBackend {
             // Chama o NOVO método com o Enum
             if (direcaoEscolhida != null) {
                 game.tentarMoverJogador(direcaoEscolhida);
+                
             }
             System.out.println("--------------\n");
             

@@ -15,11 +15,12 @@ public class PocaoDeCalda implements Coletavel {
     private int cura;
 
     public PocaoDeCalda() {
-        this.cura = 25;
+        this.cura = 5;
     }
+    
     @Override
     public String getNome() {
-        return "Poção de Calda de Morango";
+        return "pocaoDeCalda";
     }
     @Override
     public void usar(Cavaleiro cavaleiro) {

@@ -13,4 +13,5 @@ import Entidades.Cavaleiro;
 public interface Coletavel {
     void usar(Cavaleiro cavaleiro);
     String getNome();
+    
 }

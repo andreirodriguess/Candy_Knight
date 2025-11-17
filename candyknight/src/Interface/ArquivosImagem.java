@@ -10,6 +10,10 @@ public class ArquivosImagem {
     public Image ursoDeGoma = this.InicializarImagens("/Imagens/ursoDeGoma.png");
     public Image cavaleiro = this.InicializarImagens("/Imagens/player.png");
     public Image heartHP = this.InicializarImagens("/Imagens/heartHP.png");
+    public Image soldadoDeGengibre = this.InicializarImagens("/Imagens/soldadoDeGengibre.png");
+    public Image escudoDeGoma = this.InicializarImagens("/Imagens/escudoDeGoma.png");
+    public Image espadaDeAlcacuz = this.InicializarImagens("/Imagens/espadaDeAlcacuz.png");
+    public Image pocaoDeCalda = this.InicializarImagens("/Imagens/pocaoDeCalda.png");
     
     
     public Image getImage(String nomeDaImagem){

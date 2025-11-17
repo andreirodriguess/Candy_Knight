@@ -15,7 +15,6 @@ public abstract class EntidadeJogo {
     private int pontosDeVidaAtuais;
     private int potencia; //capacidade de causar dano/curar
     private boolean armado;
-    private Coletavel armaEquipada;
     
 
     public EntidadeJogo(String nome, int vidaMax, int potencia) {
@@ -28,7 +27,7 @@ public abstract class EntidadeJogo {
 
     public abstract void atacar(EntidadeJogo alvo);
     public abstract void morrer();
-
+    
     public boolean getArmado()
     {
         return this.armado;
@@ -87,10 +86,11 @@ public abstract class EntidadeJogo {
     public void setArmado(boolean estado) {
         this.armado = estado;
     }
-    public void setArma(Coletavel arma){
-        this.armaEquipada = arma;
+    
+    public boolean isPlayer(){
+        return false;
     }
-    public Coletavel getArma(){
-        return armaEquipada;
-    }
+    
+    
+    
 }

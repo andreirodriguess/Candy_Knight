@@ -9,19 +9,22 @@ import Entidades.Cavaleiro;
  *
  * @author felip
  */
-public class EspadaDeAlcacuz implements Coletavel {
+public class EspadaDeAlcacuz extends Arma {
     
-    private int novoAtaque;
+    private int ataque;
 
     public EspadaDeAlcacuz() {
-        this.novoAtaque = 5;
+        this.ataque = 5;
     }
     
+    @Override
     public String getNome() {
         return "espadaDeAlcacuz";
     }
     
+    
     // Em EspadaDeAlcacuz.java
+    @Override
     public void usar(Cavaleiro cavaleiro) {
         System.out.println(cavaleiro.getNome() + " equipou a " + this.getNome() + "!");
         
@@ -29,8 +32,26 @@ public class EspadaDeAlcacuz implements Coletavel {
 
         cavaleiro.setArma(this);
         
-        cavaleiro.setPotencia(this.novoAtaque);
+        cavaleiro.setPotencia(this.ataque);
 
-        System.out.println("Ataque aumentado para " + this.novoAtaque + "!");
+        System.out.println("Ataque aumentado para " + this.ataque + "!");
+    }
+
+    @Override
+    public void setAtaque(int novoAtaque,Cavaleiro cavaleiro){
+        this.ataque = novoAtaque;
+        cavaleiro.setPotencia(novoAtaque);
+    }
+    
+    @Override
+    public int getAtaque() {
+        return this.ataque;
+    }
+
+    @Override
+    public void quebrar(Cavaleiro cavaleiro) {
+        cavaleiro.setArmado(false);
+        cavaleiro.setArma(null);
+        cavaleiro.setPotencia(0);
     }
 }

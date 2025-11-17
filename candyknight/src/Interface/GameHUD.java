@@ -28,9 +28,11 @@ public class GameHUD extends JPanel implements KeyListener,ActionListener{
     private GameLogic gameControl = new GameLogic();
     private List<Celula> tabuleiro = new ArrayList<>();
     
+    
     //Para desenhar na tela
     private int X;
     private int Y;
+    Image sprite;
     
     //Variáveis auxiliares para deslocamento:
     private boolean animaDeslocamento = false;//Variável que sinaliza se está tendo uma animação de deslocamento
@@ -41,7 +43,7 @@ public class GameHUD extends JPanel implements KeyListener,ActionListener{
     private int Xf;//Pos final
     private int Yf;
     
-    private int direcaoMov;
+    private GameLogic.Direcao direcaoMov = null;
     private final int passo = 10;//Velocidade com que as imagens se movem
     private boolean chegouX;//Sinaliza que chegou no destino X
     private boolean chegouY;//Sinaliza que chegou no destino Y
@@ -60,6 +62,12 @@ public class GameHUD extends JPanel implements KeyListener,ActionListener{
     @Override//Vai rodar a cada 16ms (60 FPS)
     public void actionPerformed(ActionEvent e) {
         
+        if (this.direcaoMov != null) {
+            this.gameControl.tentarMoverJogador(this.direcaoMov);
+            this.direcaoMov = null;
+        }
+        
+        repaint();
     }
     
     @Override
@@ -68,34 +76,21 @@ public class GameHUD extends JPanel implements KeyListener,ActionListener{
         Graphics2D g2d = (Graphics2D) g;
         
         mostrarCelulas(g2d);
-       
         
     }
     
     public void mostrarCelulas(Graphics2D g2d){
         this.tabuleiro = this.gameControl.getTabuleiro();
-        Image sprite;
-        
         
         for(int i=0;i<9;i++){
             if(this.tabuleiro.get(i).temEntidade()){
-                //desenhar entidade:
-                sprite = this.arquivo.getImage(this.tabuleiro.get(i).getEntidade().getNome());
-                X = this.getPosXFromCard(i);
-                Y = this.getPosYFromCard(i);
-                int vidaAtual = this.tabuleiro.get(i).getEntidade().getPontosDeVidaAtuais();
-                this.desenharEntidade(sprite,X,Y, g2d,vidaAtual);
-                
-                //Desenhar arma:
-                if(this.tabuleiro.get(i).getEntidade().getArmado()){
-                    sprite = this.arquivo.getImage(this.tabuleiro.get(i).getEntidade().getArma().getNome());
-                    int danoDaArma = this.tabuleiro.get(i).getEntidade().getPotencia();
-                    this.desenharArmaNaMao(sprite, X, Y, g2d,danoDaArma);
-                }
-                
+                this.desenharEntidade(this.tabuleiro.get(i).getEntidade(),i, g2d);
+            }else if(this.tabuleiro.get(i).temItem()){
+                this.desenharItem(this.tabuleiro.get(i).getItem(),i,g2d);
             }
         }
     }
+    
     
     public void desenharImagem(Image imagem,int X,int Y,int size,Graphics2D g2d){
         //Tenta desenhar na tela uma imagem na tela tamanho (size X size)
@@ -106,19 +101,47 @@ public class GameHUD extends JPanel implements KeyListener,ActionListener{
                 g2d.fillRect(X, Y, size, size);
             }
     }
-    public void desenharEntidade(Image imagemArma,int X,int Y,Graphics2D g2d,int vida){
-        this.desenharImagem(imagemArma, X+(this.sg.cartaLargura-this.sg.tamanhoSprite)/2, Y+(this.sg.cartaAltura-this.sg.tamanhoSprite)/2, this.sg.tamanhoSprite, g2d);
+    public void desenharItem(Coletavel C,int indice,Graphics2D g2d){
+        sprite = this.arquivo.getImage(C.getNome());
+        X = this.getPosXFromCard(indice);
+        Y = this.getPosYFromCard(indice);
+        int Xoffset = (this.sg.cartaLargura-this.sg.tamanhoSprite)/2;
+        int Yoffset = (this.sg.cartaAltura-this.sg.tamanhoSprite)/2;
+        this.desenharImagem(sprite, X+Xoffset, Y+Yoffset, this.sg.tamanhoSprite, g2d);
+        
+    }
+    public void desenharEntidade(EntidadeJogo E,int indice, Graphics2D g2d){
+        sprite = this.arquivo.getImage(E.getNome());
+        X = this.getPosXFromCard(indice);
+        Y = this.getPosYFromCard(indice);
+        
+        int Xoffset = (this.sg.cartaLargura-this.sg.tamanhoSprite)/2;
+        int Yoffset = (this.sg.cartaAltura-this.sg.tamanhoSprite)/2;
+        
+        this.desenharImagem(sprite, X+Xoffset, Y+Yoffset, this.sg.tamanhoSprite, g2d);
         
         //apresentar HP
+        int vida = E.getPontosDeVidaAtuais();
+        
         int xHP = X+this.sg.cartaLargura-30;
-        int yHP = Y+20;
-        
+        int yHP = Y+15;
         this.desenharImagem(this.arquivo.heartHP,xHP,yHP , 30, g2d);
-        
         
         g2d.setFont(new Font("Arial", Font.BOLD, 15));
         g2d.setColor(Color.BLACK);
         g2d.drawString(""+vida, xHP+5,yHP);
+        
+        //Se for o player apresentar arma na mão do personagem:
+        if(E.isPlayer()){
+            if(E.getArmado()){
+                sprite = this.arquivo.getImage(((Cavaleiro) E).getArma().getNome());
+                int danoDaArma = E.getPotencia();
+                this.desenharArmaNaMao(sprite, X, Y, g2d,danoDaArma);
+            }
+            if(((Cavaleiro)E).isEscudoDeTrocaAtivo()){
+                this.desenharEscudo(sprite, X, Y, g2d);
+            }
+        }
     }
     public void desenharArmaNaMao(Image imagemArma,int X,int Y,Graphics2D g2d,int dano){
         this.desenharImagem(imagemArma, X-15, Y+45,(this.sg.tamanhoSprite-this.sg.tamanhoSprite/4), g2d);
@@ -128,12 +151,18 @@ public class GameHUD extends JPanel implements KeyListener,ActionListener{
         g2d.drawString(""+dano, X+10, Y+this.sg.cartaAltura-10);
         
     }
-    
-    public void Mover(int direcao){
+    public void desenharEscudo(Image imagemArma,int X,int Y,Graphics2D g2d){
+        
+        int Xoffset = this.sg.cartaLargura-80;
+        int Yoffset = (this.sg.cartaAltura/4)+10;
+        
+        this.desenharImagem(this.arquivo.escudoDeGoma, X+Xoffset, Y+Yoffset,(this.sg.tamanhoSprite-this.sg.tamanhoSprite/6), g2d);
+        
         
     }
     
-    //métodos de auxilio Implementado
+    
+    //métodos de auxílio - Implementado()
     private void setPosFinal(int X,int Y,int direcao){
         //define a posição final com base na direção e pos inicial
         int distanciaX = sg.cartaLargura + sg.gridGap;
@@ -259,28 +288,28 @@ public class GameHUD extends JPanel implements KeyListener,ActionListener{
             case KeyEvent.VK_W:
             case KeyEvent.VK_UP:
                 if (!upPressed) { 
-                    this.Mover(0);
+                    this.direcaoMov = GameLogic.Direcao.CIMA;
                     upPressed = true;
                 }
                 break;
             case KeyEvent.VK_S:
             case KeyEvent.VK_DOWN:
                 if (!downPressed) {
-                    this.Mover(1);
+                    this.direcaoMov = GameLogic.Direcao.BAIXO;
                     downPressed = true;
                 }
                 break;
             case KeyEvent.VK_A:
             case KeyEvent.VK_LEFT:
                 if (!leftPressed) {
-                    this.Mover(2);
+                    this.direcaoMov = GameLogic.Direcao.ESQUERDA;
                     leftPressed = true;
                 }
                 break;
             case KeyEvent.VK_D:
             case KeyEvent.VK_RIGHT:
                 if (!rightPressed) {
-                    this.Mover(3);
+                    this.direcaoMov = GameLogic.Direcao.DIREITA;
                     rightPressed = true;
                 }
                 break;

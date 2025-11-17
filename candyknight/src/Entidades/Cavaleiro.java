@@ -13,10 +13,10 @@ import Coletaveis.*;
 public class Cavaleiro extends EntidadeJogo {
 
     private int dinheiro;
+    private Arma armaEquipada;
 
     // NOVOS CAMPOS PARA O ESCUDO
     private boolean escudoDeTrocaAtivo;
-    private int duracaoEscudo;
     private Coletavel armaInicial;
             
     public Cavaleiro(String nome) {
@@ -28,7 +28,6 @@ public class Cavaleiro extends EntidadeJogo {
         
         // Inicializa os novos campos
         this.escudoDeTrocaAtivo = false;
-        this.duracaoEscudo = 0;
     }
 
     public void atacar(EntidadeJogo alvo) {
@@ -56,29 +55,32 @@ public class Cavaleiro extends EntidadeJogo {
      */
     public void ativarEscudoDeTroca(int duracao) {
         this.escudoDeTrocaAtivo = true;
-        this.duracaoEscudo = duracao;
+        System.out.println(this.getNome() + " sente uma energia elástica ao seu redor!");
+    }
+    public void desativarEscudoDeTroca() {
+        this.escudoDeTrocaAtivo = false;
         System.out.println(this.getNome() + " sente uma energia elástica ao seu redor!");
     }
 
-    /**
-     * Deve ser chamado a cada movimento/turno do jogador.
-     * Reduz a duração dos buffs ativos.
-     */
-    public void decrementarDuracaoBuffs() {
-        if (this.escudoDeTrocaAtivo) {
-            this.duracaoEscudo--;
-            if (this.duracaoEscudo <= 0) {
-                this.escudoDeTrocaAtivo = false;
-                System.out.println("O efeito do Escudo de Goma passou!");
-            }
-        }
-    }
     
-    /**
-     * Verifica se o escudo de troca está ativo.
-     * @return true se o jogador pode trocar de lugar, false caso contrário.
-     */
     public boolean isEscudoDeTrocaAtivo() {
         return this.escudoDeTrocaAtivo;
+    }
+    
+    @Override
+    public boolean isPlayer(){
+        return true;
+    }
+    
+    public void setArma(Arma arma){
+        this.armaEquipada = arma;
+    }
+    
+    public Arma getArma(){
+        return armaEquipada;
+    }
+    
+    public int getDinheiro(){
+        return this.dinheiro;
     }
 }

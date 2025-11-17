@@ -13,6 +13,9 @@ import java.util.Collections;
  */
 public class GameLogic {
     
+    
+    private boolean partidaAtiva;
+    private int pontuacaoFinal = 0;
     // +++ NOVO: Enum para Direções +++
     /**
      * Define as direções de movimento possíveis.
@@ -40,6 +43,8 @@ public class GameLogic {
      */
     public void iniciarTabuleiro() {
         // 1. Cria 9 células vazias
+        partidaAtiva = true;
+        
         tabuleiro.clear();
         for (int i = 0; i < TAMANHO_TABULEIRO; i++) {
             tabuleiro.add(new Celula());
@@ -56,62 +61,63 @@ public class GameLogic {
 
         // 4. Adiciona itens (ex: posições 3 e 5)
         // (Adicionei a EspadaDeAlcacuz para testar a tua correção!)
-        tabuleiro.get(3).setItem(new Coletaveis.EspadaDeAlcacuz()); 
+        tabuleiro.get(3).setItem(new Coletaveis.EscudoDeGoma()); 
         tabuleiro.get(5).setItem(new Coletaveis.PocaoDeCalda());
     }
+    
 
     // +++ MÉTODO NOVO (Lógica de Direção) +++
-    /**
-     * Tenta mover o jogador numa direção específica.
-     * @param direcao A direção (CIMA, BAIXO, ESQUERDA, DIREITA) para onde mover.
-     */
+    
+    
     public void tentarMoverJogador(Direcao direcao) {
         
-        int proximaPosicao = -1;
-        int posAtual = this.posicaoJogador;
+        if(this.partidaAtiva){
+            int proximaPosicao = -1;
+            int posAtual = this.posicaoJogador;
 
-        // 1. Calcula a posição de destino e verifica os limites do tabuleiro
-        switch (direcao) {
-            case CIMA:
-                // Não pode mover para cima se estiver na linha 0 (pos 0, 1, 2)
-                if (posAtual < 3) {
-                    System.out.println("Não pode mover-se para cima. (Borda do tabuleiro)");
-                    return; // Para a execução do método
-                }
-                proximaPosicao = posAtual - 3; // Move uma linha para cima
-                break;
+            // 1. Calcula a posição de destino e verifica os limites do tabuleiro
+            switch (direcao) {
+                case CIMA:
+                    // Não pode mover para cima se estiver na linha 0 (pos 0, 1, 2)
+                    if (posAtual < 3) {
+                        System.out.println("Não pode mover-se para cima. (Borda do tabuleiro)");
+                        return; // Para a execução do método
+                    }
+                    proximaPosicao = posAtual - 3; // Move uma linha para cima
+                    break;
 
-            case BAIXO:
-                // Não pode mover para baixo se estiver na linha 2 (pos 6, 7, 8)
-                if (posAtual > 5) {
-                    System.out.println("Não pode mover-se para baixo. (Borda do tabuleiro)");
-                    return;
-                }
-                proximaPosicao = posAtual + 3; // Move uma linha para baixo
-                break;
+                case BAIXO:
+                    // Não pode mover para baixo se estiver na linha 2 (pos 6, 7, 8)
+                    if (posAtual > 5) {
+                        System.out.println("Não pode mover-se para baixo. (Borda do tabuleiro)");
+                        return;
+                    }
+                    proximaPosicao = posAtual + 3; // Move uma linha para baixo
+                    break;
 
-            case ESQUERDA:
-                // Não pode mover para esquerda se estiver na coluna 0 (pos 0, 3, 6)
-                if (posAtual % 3 == 0) {
-                    System.out.println("Não pode mover-se para a esquerda. (Borda do tabuleiro)");
-                    return;
-                }
-                proximaPosicao = posAtual - 1; // Move uma coluna para esquerda
-                break;
+                case ESQUERDA:
+                    // Não pode mover para esquerda se estiver na coluna 0 (pos 0, 3, 6)
+                    if (posAtual % 3 == 0) {
+                        System.out.println("Não pode mover-se para a esquerda. (Borda do tabuleiro)");
+                        return;
+                    }
+                    proximaPosicao = posAtual - 1; // Move uma coluna para esquerda
+                    break;
 
-            case DIREITA:
-                // Não pode mover para direita se estiver na coluna 2 (pos 2, 5, 8)
-                if (posAtual % 3 == 2) {
-                    System.out.println("Não pode mover-se para a direita. (Borda do tabuleiro)");
-                    return;
-                }
-                proximaPosicao = posAtual + 1; // Move uma coluna para direita
-                break;
-        }
+                case DIREITA:
+                    // Não pode mover para direita se estiver na coluna 2 (pos 2, 5, 8)
+                    if (posAtual % 3 == 2) {
+                        System.out.println("Não pode mover-se para a direita. (Borda do tabuleiro)");
+                        return;
+                    }
+                    proximaPosicao = posAtual + 1; // Move uma coluna para direita
+                    break;
+            }
 
-        // 2. Se o cálculo foi bem-sucedido, processa a interação
-        if (proximaPosicao != -1) {
-            processarInteracao(proximaPosicao);
+            // 2. Se o cálculo foi bem-sucedido, processa a interação
+            if (proximaPosicao != -1) {
+                processarInteracao(proximaPosicao);
+            }
         }
     }
     
@@ -146,22 +152,28 @@ public class GameLogic {
             if (jogador.getArmado()) {
                 System.out.println(jogador.getNome() + " está armado e ataca!");
                 jogador.atacar(monstro);
+                if(jogador.getArma().getAtaque()<monstro.getPontosDeVidaAtuais()){
+                    jogador.getArma().setAtaque(jogador.getArma().getAtaque()-monstro.getPontosDeVidaAtuais(),jogador);// NovoATK = AtaqueArma - VidaMonstro
+                }else{
+                    jogador.getArma().quebrar(jogador);//Quebra a arma do jogador
+                }
             } else {
+                //Temos 2 situações:
+                //Caso tenha escudo, troca de lugar com o monstro
+                if(jogador.isEscudoDeTrocaAtivo()){
+                    celulaAtual.setEntidade(monstro);
+                    jogador.desativarEscudoDeTroca();
+                }else{
+                    //caso não tenha escudo, monstro morre, jogador anda, jogador perde vida = 
+                    jogador.receberDano(monstro.getPontosDeVidaAtuais());
+                    celulaDestino.limparEntidade();//limpa celula do monstro
+                    celulaDestino.setEntidade(jogador); // Coloca o jogador na nova célula
+                    celulaAtual.limparEntidade();  //Retira o jogador da celula antiga
+                }
+                celulaDestino.setEntidade(jogador);
+                this.posicaoJogador = proximaPosicao;
                 System.out.println(jogador.getNome() + " está desarmado e não pode atacar!");
             }
-
-            // Se o monstro sobreviveu...
-            if (monstro.estaVivo()) {
-                // Ele só ataca de volta se o jogador estiver SEM arma
-                if (!jogador.getArmado()) {
-                    System.out.println(monstro.getNome() + " revida o encontro!");
-                    monstro.atacar(jogador);
-                } else {
-                    System.out.println(monstro.getNome() + " fica intimidado pela arma do jogador!");
-                }
-            }
-            // +++ FIM MODIFICAÇÃO (REGRA 1) +++
-
 
             // Se o monstro foi derrotado
             if (!monstro.estaVivo()) {
@@ -178,8 +190,6 @@ public class GameLogic {
                 // +++ FIM MODIFICAÇÃO (REGRA 2) +++
             }
             
-            // Se o monstro AINDA ESTÁ VIVO, o jogador NÃO se move.
-            // (Não alterámos isto)
             
         } else {
             // 3. Célula livre, move o jogador (Lógica normal de movimento)
@@ -189,13 +199,24 @@ public class GameLogic {
             System.out.println(jogador.getNome() + " se moveu para a posição " + proximaPosicao);
         }
         
-        jogador.decrementarDuracaoBuffs();
+        if(!jogador.estaVivo()){
+                this.encerrarPartida();
+        }
+            
     }
     
-    /**
-     * Permite que outras classes (como o TabuleiroPanel) leiam o tabuleiro.
-     * @return O ArrayList de Células.
-     */
+    public void encerrarPartida(){
+       this.partidaAtiva = false;
+       this.pontuacaoFinal = ((Cavaleiro)this.tabuleiro.get(posicaoJogador).getEntidade()).getDinheiro();
+       System.out.println("A PARTIDA ACABOU!!!");
+    }
+    
+    public boolean getPartidaAtivo(){
+        return this.partidaAtiva;
+    }
+    public int getPontucaoFinal(){
+        return this.pontuacaoFinal;
+    }
     public ArrayList<Celula> getTabuleiro() {
         return this.tabuleiro;
     }
