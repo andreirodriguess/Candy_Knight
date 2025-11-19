@@ -1,222 +1,273 @@
 package Backend;
 
 import Backend.Celula;
-import Coletaveis.Coletavel;
+import Coletaveis.*;
 import Entidades.Cavaleiro;
-import Entidades.EntidadeJogo;
+import Entidades.*; // Importa UrsoDeGoma, SoldadoGengibre, etc.
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
+import java.util.List;
 
 /**
- * Classe central que gerencia o estado do jogo, o tabuleiro
- * e as interações entre as células.
+ * Classe central que gerencia o estado do jogo.
  */
 public class GameLogic {
     
-    
-    private boolean partidaAtiva;
-    private int pontuacaoFinal = 0;
-    // +++ NOVO: Enum para Direções +++
-    /**
-     * Define as direções de movimento possíveis.
-     * Usar um enum torna o código mais limpo e seguro.
-     */
+    // === ENUMERAÇÕES ===
     public enum Direcao {
-        CIMA,//0
-        BAIXO,//1
-        ESQUERDA,//2
-        DIREITA//3
+        CIMA, BAIXO, ESQUERDA, DIREITA
     }
-    // +++ Fim da Adição +++
 
+    // === ATRIBUTOS ===
     private ArrayList<Celula> tabuleiro;
     private final int TAMANHO_TABULEIRO = 9; // 3x3
     private int posicaoJogador;
 
+    // Geradores e Dificuldade
+    private Random random;
+    private int nivelDificuldade;
+
+    // Estado do Jogo
+    private boolean partidaAtiva;
+    private int pontuacaoFinal = 0;
+
+    // === CONSTRUTOR ===
     public GameLogic() {
         this.tabuleiro = new ArrayList<>(TAMANHO_TABULEIRO);
+        this.random = new Random(); 
+        this.nivelDificuldade = 0;
+        this.partidaAtiva = true;
         iniciarTabuleiro();
     }
 
-    /**
-     * Prepara o tabuleiro para um novo jogo.
-     */
+    // === INICIALIZAÇÃO ===
     public void iniciarTabuleiro() {
-        // 1. Cria 9 células vazias
-        partidaAtiva = true;
-        
+        this.partidaAtiva = true;
+        this.nivelDificuldade = 0;
+        this.pontuacaoFinal = 0;
+
+        // 1. Cria células vazias
         tabuleiro.clear();
         for (int i = 0; i < TAMANHO_TABULEIRO; i++) {
             tabuleiro.add(new Celula());
         }
 
-        // 2. Adiciona o jogador (ex: posição 4, o centro)
-        tabuleiro.get(4).setEntidade(new Entidades.Cavaleiro("player"));
+        // 2. Adiciona o jogador no centro (Posição 4)
+        tabuleiro.get(4).setEntidade(new Cavaleiro("Sir Doce"));
         this.posicaoJogador = 4;
+
+        // 3. Adiciona monstros iniciais (CORRIGIDO: Passando o nível 0)
+        tabuleiro.get(1).setEntidade(new UrsoDeGoma(this.nivelDificuldade));
+        tabuleiro.get(7).setEntidade(new SoldadoGengibre(this.nivelDificuldade));
+
+        // 4. Adiciona itens iniciais
+        tabuleiro.get(3).setItem(new EspadaDeAlcacuz(this.nivelDificuldade)); 
+        tabuleiro.get(5).setItem(new PocaoDeCalda(this.nivelDificuldade));
         
-
-        // 3. Adiciona monstros (ex: posições 1 e 7)
-        tabuleiro.get(1).setEntidade(new Entidades.UrsoDeGoma());
-        tabuleiro.get(7).setEntidade(new Entidades.SoldadoGengibre());
-
-        // 4. Adiciona itens (ex: posições 3 e 5)
-        // (Adicionei a EspadaDeAlcacuz para testar a tua correção!)
-        tabuleiro.get(3).setItem(new Coletaveis.EscudoDeGoma()); 
-        tabuleiro.get(5).setItem(new Coletaveis.PocaoDeCalda());
+        System.out.println("Novo jogo iniciado! Dificuldade: " + nivelDificuldade);
     }
-    
 
-    // +++ MÉTODO NOVO (Lógica de Direção) +++
-    
-    
+    // === LÓGICA DE MOVIMENTO ===
     public void tentarMoverJogador(Direcao direcao) {
-        
-        if(this.partidaAtiva){
-            int proximaPosicao = -1;
-            int posAtual = this.posicaoJogador;
-
-            // 1. Calcula a posição de destino e verifica os limites do tabuleiro
-            switch (direcao) {
-                case CIMA:
-                    // Não pode mover para cima se estiver na linha 0 (pos 0, 1, 2)
-                    if (posAtual < 3) {
-                        System.out.println("Não pode mover-se para cima. (Borda do tabuleiro)");
-                        return; // Para a execução do método
-                    }
-                    proximaPosicao = posAtual - 3; // Move uma linha para cima
-                    break;
-
-                case BAIXO:
-                    // Não pode mover para baixo se estiver na linha 2 (pos 6, 7, 8)
-                    if (posAtual > 5) {
-                        System.out.println("Não pode mover-se para baixo. (Borda do tabuleiro)");
-                        return;
-                    }
-                    proximaPosicao = posAtual + 3; // Move uma linha para baixo
-                    break;
-
-                case ESQUERDA:
-                    // Não pode mover para esquerda se estiver na coluna 0 (pos 0, 3, 6)
-                    if (posAtual % 3 == 0) {
-                        System.out.println("Não pode mover-se para a esquerda. (Borda do tabuleiro)");
-                        return;
-                    }
-                    proximaPosicao = posAtual - 1; // Move uma coluna para esquerda
-                    break;
-
-                case DIREITA:
-                    // Não pode mover para direita se estiver na coluna 2 (pos 2, 5, 8)
-                    if (posAtual % 3 == 2) {
-                        System.out.println("Não pode mover-se para a direita. (Borda do tabuleiro)");
-                        return;
-                    }
-                    proximaPosicao = posAtual + 1; // Move uma coluna para direita
-                    break;
-            }
-
-            // 2. Se o cálculo foi bem-sucedido, processa a interação
-            if (proximaPosicao != -1) {
-                processarInteracao(proximaPosicao);
-            }
-        }
-    }
-    
-    private void processarInteracao(int proximaPosicao) {
-        
-        if (proximaPosicao < 0 || proximaPosicao >= TAMANHO_TABULEIRO) {
-            System.out.println("Movimento inválido.");
+        if (!this.partidaAtiva) {
+            System.out.println("A partida acabou. Reinicie o jogo.");
             return;
         }
 
-        Celula celulaAtual = tabuleiro.get(posicaoJogador);
-        Celula celulaDestino = tabuleiro.get(proximaPosicao);
+        int posAtual = this.posicaoJogador;
+        int proximaPosicao = -1;
+        int posicaoOposta = -1; 
+        boolean opostaValida = false; 
 
+        // Lógica para calcular destino e posição oposta (para o "spawn" de novos inimigos)
+        switch (direcao) {
+            case CIMA:
+                if (posAtual >= 3) { 
+                    proximaPosicao = posAtual - 3;
+                    if (posAtual <= 5) { posicaoOposta = posAtual + 3; opostaValida = true; }
+                }
+                break;
+            case BAIXO:
+                if (posAtual <= 5) { 
+                    proximaPosicao = posAtual + 3;
+                    if (posAtual >= 3) { posicaoOposta = posAtual - 3; opostaValida = true; }
+                }
+                break;
+            case ESQUERDA:
+                if (posAtual % 3 != 0) { 
+                    proximaPosicao = posAtual - 1;
+                    if (posAtual % 3 != 2) { posicaoOposta = posAtual + 1; opostaValida = true; }
+                }
+                break;
+            case DIREITA:
+                if (posAtual % 3 != 2) { 
+                    proximaPosicao = posAtual + 1;
+                    if (posAtual % 3 != 0) { posicaoOposta = posAtual - 1; opostaValida = true; }
+                }
+                break;
+        }
+
+        if (proximaPosicao != -1) {
+            // Tenta interagir/mover. Retorna true se o jogador saiu da casa atual.
+            boolean jogadorMoveu = processarInteracao(proximaPosicao, posAtual);
+            
+            Cavaleiro jogador = (Cavaleiro) tabuleiro.get(this.posicaoJogador).getEntidade();
+
+            // Verifica Game Over
+            if (jogador == null || !jogador.estaVivo()) {
+                encerrarPartida();
+                return;
+            } 
+
+            // Lógica de "Puxar" o tabuleiro (Spawnar novos inimigos nas costas do jogador)
+            if (jogadorMoveu && opostaValida) {
+                this.nivelDificuldade++; // Aumenta dificuldade a cada passo
+                
+                Celula celulaOposta = tabuleiro.get(posicaoOposta);
+                Celula celulaVazia = tabuleiro.get(posAtual); // Onde o jogador estava
+                
+                // Puxa o conteúdo da ponta para o centro
+                celulaVazia.setEntidade(celulaOposta.getEntidade());
+                celulaVazia.setItem(celulaOposta.getItem());
+                
+                // Gera novo monstro/item na borda que ficou vazia
+                celulaOposta.limparEntidade();
+                celulaOposta.limparItem();
+                gerarConteudoAleatorio(celulaOposta);
+            }
+        } else {
+            System.out.println("Movimento inválido (Borda).");
+        }
+    }
+ 
+    
+    //PROCESSA A INTERAÇÃO DO JOGADOR COM O QUE HOUVER NA CELULA DE DESTINO
+    private boolean processarInteracao(int proximaPosicao, int posicaoAntiga) {
+        Celula celulaAtual = tabuleiro.get(posicaoAntiga); 
+        Celula celulaDestino = tabuleiro.get(proximaPosicao);
         Cavaleiro jogador = (Cavaleiro) celulaAtual.getEntidade();
 
-        // 1. Interage com item na célula de destino
+        // 1. Interage com ITEM
         if (celulaDestino.temItem()) {
             Coletavel item = celulaDestino.getItem();
-            System.out.println(jogador.getNome() + " encontrou e usou " + item.getNome() + "!");
             item.usar(jogador);
             celulaDestino.limparItem(); 
         }
 
-        // 2. Interage com entidade (monstro) na célula de destino
+        // 2. Interage com MONSTRO
         if (celulaDestino.temEntidade()) {
             EntidadeJogo monstro = celulaDestino.getEntidade();
-            System.out.println(jogador.getNome() + " encontra " + monstro.getNome() + "!");
-            
-            // +++ INÍCIO MODIFICAÇÃO (REGRA 1: Combate) +++
-            
-            // O jogador só ataca se estiver armado
+            System.out.println("Encontro com " + monstro.getNome() + "!");
+
             if (jogador.getArmado()) {
-                System.out.println(jogador.getNome() + " está armado e ataca!");
+                // Combate com arma
                 jogador.atacar(monstro);
-                if(jogador.getArma().getAtaque()<monstro.getPontosDeVidaAtuais()){
-                    jogador.getArma().setAtaque(jogador.getArma().getAtaque()-monstro.getPontosDeVidaAtuais(),jogador);// NovoATK = AtaqueArma - VidaMonstro
-                }else{
-                    jogador.getArma().quebrar(jogador);//Quebra a arma do jogador
+                
+                // Reduz dano da arma ou quebra
+                if(jogador.getArma().getAtaque() < monstro.getPontosDeVidaAtuais()){
+                    int novoAtaque = Math.max(1, jogador.getArma().getAtaque() - 2); // Perde fio
+                    jogador.getArma().setAtaque(novoAtaque, jogador); 
+                } else {
+                    jogador.getArma().quebrar(jogador); // Quebra se matar hitkill (exemplo)
                 }
+
             } else {
-                //Temos 2 situações:
-                //Caso tenha escudo, troca de lugar com o monstro
-                if(jogador.isEscudoDeTrocaAtivo()){
+                // Combate desarmado ou Esquiva
+                if (jogador.isEscudoDeTrocaAtivo()) {
+                    System.out.println("Escudo de Troca! Trocando de lugar com o monstro.");
                     celulaAtual.setEntidade(monstro);
-                    jogador.desativarEscudoDeTroca();
-                }else{
-                    //caso não tenha escudo, monstro morre, jogador anda, jogador perde vida = 
-                    jogador.receberDano(monstro.getPontosDeVidaAtuais());
-                    celulaDestino.limparEntidade();//limpa celula do monstro
-                    celulaDestino.setEntidade(jogador); // Coloca o jogador na nova célula
-                    celulaAtual.limparEntidade();  //Retira o jogador da celula antiga
+                    celulaDestino.setEntidade(jogador);
+                    this.posicaoJogador = proximaPosicao;
+                    return true; 
                 }
-                celulaDestino.setEntidade(jogador);
-                this.posicaoJogador = proximaPosicao;
-                System.out.println(jogador.getNome() + " está desarmado e não pode atacar!");
+                //lutando totalmente desarmado
+                else{
+                    jogador.receberDano(monstro.getPontosDeVidaAtuais()); 
+                    
+                    // Remove o monstro (ele é destruído na colisão)
+                    celulaDestino.limparEntidade(); 
+                    
+                    // Move o jogador para a posição do monstro
+                    celulaDestino.setEntidade(jogador); 
+                    celulaAtual.limparEntidade();       
+                    this.posicaoJogador = proximaPosicao;
+                    
+                    return true;
+                }
+                
             }
 
-            // Se o monstro foi derrotado
+            // Se venceu
             if (!monstro.estaVivo()) {
-                System.out.println(jogador.getNome() + " derrotou " + monstro.getNome() + "!");
-                celulaDestino.limparEntidade(); // Limpa o monstro
+                System.out.println("Monstro derrotado!");
+                if (monstro instanceof MonstroDoce) {
+                    jogador.coletarDinheiro(((MonstroDoce)monstro).getRecompensaEmDinheiro());
+                }
+                celulaDestino.limparEntidade();
                 
-                // +++ INÍCIO MODIFICAÇÃO (REGRA 2: Movimento pós-vitória) +++
-                System.out.println(jogador.getNome() + " toma a posição do monstro!");
+                // Move jogador
+                celulaDestino.setEntidade(jogador);
+                celulaAtual.limparEntidade();
+                this.posicaoJogador = proximaPosicao;
                 
-                // (Esta é a mesma lógica de movimento da secção "else" abaixo)
-                celulaDestino.setEntidade(jogador); // Coloca o jogador na nova célula
-                celulaAtual.limparEntidade();       // Limpa o jogador da célula antiga
-                this.posicaoJogador = proximaPosicao; // ATUALIZA a posição do jogador
-                // +++ FIM MODIFICAÇÃO (REGRA 2) +++
+                return true;
             }
             
+            return false; // MORREU
             
         } else {
-            // 3. Célula livre, move o jogador (Lógica normal de movimento)
+            // 3. Célula VAZIA
             celulaDestino.setEntidade(jogador); 
             celulaAtual.limparEntidade();       
             this.posicaoJogador = proximaPosicao; 
-            System.out.println(jogador.getNome() + " se moveu para a posição " + proximaPosicao);
+            return true;
         }
-        
-        if(!jogador.estaVivo()){
-                this.encerrarPartida();
-        }
-            
     }
+
+    // === GERADORES ===
     
+    private void gerarConteudoAleatorio(Celula celula) {
+        int roll = random.nextInt(10); // 0 a 9
+        if (roll < 4) { // 40% Monstro
+            celula.setEntidade(getMonstroAleatorio(this.nivelDificuldade));
+        } else if (roll < 7) { // 30% Item
+            celula.setItem(getItemAleatorio(this.nivelDificuldade));
+        } 
+        // 30% Vazio
+    }
+
+    private MonstroDoce getMonstroAleatorio(int nivel) {
+        int tipo = random.nextInt(3);
+        switch (tipo) {
+            case 0: return new UrsoDeGoma(nivel);
+            case 1: return new SoldadoGengibre(nivel);
+            default: return new PeDeMolequinho(nivel);
+        }
+    }
+
+    private Coletavel getItemAleatorio(int nivel) {
+        int tipo = random.nextInt(3); 
+        switch (tipo) {
+            case 0: return new PocaoDeCalda(nivel);
+            case 1: return new EspadaDeAlcacuz(nivel); 
+            default: return new EscudoDeGoma(nivel);
+        }
+    }
+
     public void encerrarPartida(){
        this.partidaAtiva = false;
-       this.pontuacaoFinal = ((Cavaleiro)this.tabuleiro.get(posicaoJogador).getEntidade()).getDinheiro();
-       System.out.println("A PARTIDA ACABOU!!!");
+       // Tenta recuperar jogador para pegar pontuação, se ainda existir na referência
+       if (posicaoJogador >= 0 && posicaoJogador < TAMANHO_TABULEIRO) {
+           EntidadeJogo ent = tabuleiro.get(posicaoJogador).getEntidade();
+           if (ent instanceof Cavaleiro) {
+               this.pontuacaoFinal = ((Cavaleiro)ent).getDinheiro();
+           }
+       }
+       System.out.println("=== GAME OVER ===");
+       System.out.println("Pontuação Final: " + this.pontuacaoFinal);
     }
-    
-    public boolean getPartidaAtivo(){
-        return this.partidaAtiva;
-    }
-    public int getPontucaoFinal(){
-        return this.pontuacaoFinal;
-    }
+
     public ArrayList<Celula> getTabuleiro() {
         return this.tabuleiro;
     }

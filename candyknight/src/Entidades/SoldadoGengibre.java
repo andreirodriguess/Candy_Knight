@@ -1,18 +1,17 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Entidades;
-/**
- *
- * @author felip
- */
+
 public class SoldadoGengibre extends MonstroDoce {
 
-    public SoldadoGengibre() {
-        super("soldadoDeGengibre", 10, 8, 20);
+    public SoldadoGengibre(int nivelDificuldade) {
+        super(
+            "Soldado de Gengibre", 
+            4 + (nivelDificuldade * 2), // Vida Base: 4. Escala mais rápido (+2/nível)
+            2 + (nivelDificuldade * 1), // Força Base: 2
+            10 + (nivelDificuldade * 3) // Recompensa maior
+        );
     }
 
+    @Override
     public void atacar(EntidadeJogo alvo) {
         if (!alvo.estaVivo()) return;
         
@@ -20,6 +19,7 @@ public class SoldadoGengibre extends MonstroDoce {
         alvo.receberDano(this.getPotencia());
     }
 
+    @Override
     public void morrer() {
         System.out.println(this.getNome() + " se espatifou!");
     }

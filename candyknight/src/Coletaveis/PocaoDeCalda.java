@@ -14,18 +14,26 @@ public class PocaoDeCalda implements Coletavel {
 
     private int cura;
 
+    // Construtor com nível
+    public PocaoDeCalda(int nivel) {
+        // Cura base 5 (50% do HP inicial). Aumenta 1 a cada 2 níveis.
+        this.cura = 5 + (nivel / 2);
+    }
+    
+    // Construtor padrão
     public PocaoDeCalda() {
-        this.cura = 5;
+        this(0);
     }
     
     @Override
     public String getNome() {
-        return "pocaoDeCalda";
+        return "Poção de Calda de Morango";
     }
+
     @Override
     public void usar(Cavaleiro cavaleiro) {
-        System.out.println(cavaleiro.getNome() + " usou " + this.getNome() + "!");
+        System.out.println(cavaleiro.getNome() + " bebeu a " + this.getNome() + "!");
         cavaleiro.curar(this.cura);
-        System.out.println("Vida recuperada em " + this.cura + " pontos!");
+        // A mensagem de cura já é exibida dentro do método cavaleiro.curar()
     }
 }
