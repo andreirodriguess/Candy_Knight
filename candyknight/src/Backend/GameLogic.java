@@ -1,7 +1,7 @@
 package Backend;
 
 import Backend.Celula;
-import Coletaveis.Coletavel;
+import Coletaveis.*;
 import Entidades.Cavaleiro;
 import Entidades.*;
 import java.util.ArrayList;
