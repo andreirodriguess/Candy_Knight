@@ -66,7 +66,7 @@ public abstract class EntidadeJogo {
     }
 
     // Necessário para PeDeMolequinho (Fase 2)
-    protected void setPontosDeVidaAtuais(int valor) {
+    public void setPontosDeVidaAtuais(int valor) {
         if (valor < 0) {
             this.pontosDeVidaAtuais = 0;
         } else if (valor > this.pontosDeVidaMax) {

@@ -2,6 +2,7 @@ package Backend;
 
 // Importa as classes necessárias
 import Backend.Celula;
+import Coletaveis.*;
 import Entidades.Cavaleiro;
 import Entidades.MonstroDoce;
 import Entidades.EntidadeJogo;
