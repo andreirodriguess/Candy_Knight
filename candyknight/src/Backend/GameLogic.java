@@ -140,7 +140,9 @@ public class GameLogic {
             System.out.println("Movimento inválido (Borda).");
         }
     }
+ 
     
+    //PROCESSA A INTERAÇÃO DO JOGADOR COM O QUE HOUVER NA CELULA DE DESTINO
     private boolean processarInteracao(int proximaPosicao, int posicaoAntiga) {
         Celula celulaAtual = tabuleiro.get(posicaoAntiga); 
         Celula celulaDestino = tabuleiro.get(proximaPosicao);
@@ -178,10 +180,22 @@ public class GameLogic {
                     celulaDestino.setEntidade(jogador);
                     this.posicaoJogador = proximaPosicao;
                     return true; 
-                } 
+                }
+                //lutando totalmente desarmado
+                else{
+                    jogador.receberDano(monstro.getPontosDeVidaAtuais()); 
+                    
+                    // Remove o monstro (ele é destruído na colisão)
+                    celulaDestino.limparEntidade(); 
+                    
+                    // Move o jogador para a posição do monstro
+                    celulaDestino.setEntidade(jogador); 
+                    celulaAtual.limparEntidade();       
+                    this.posicaoJogador = proximaPosicao;
+                    
+                    return true;
+                }
                 
-                // Toma dano
-                monstro.atacar(jogador);
             }
 
             // Se venceu
@@ -200,7 +214,7 @@ public class GameLogic {
                 return true;
             }
             
-            return false; // Não moveu (luta continua ou morreu)
+            return false; // MORREU
             
         } else {
             // 3. Célula VAZIA
