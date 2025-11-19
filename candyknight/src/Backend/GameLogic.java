@@ -3,17 +3,14 @@ package Backend;
 import Backend.Celula;
 import Coletaveis.*;
 import Entidades.Cavaleiro;
-import Entidades.*;
+import Entidades.*; // Importa UrsoDeGoma, SoldadoGengibre, etc.
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Collections;
 import java.util.Random;
 import java.util.List;
 
 /**
- * Classe central unificada que gerencia o estado do jogo.
- * Combina a geração aleatória e mecânica de "puxar" (Versão 1)
- * com as regras de combate, durabilidade e Game Over (Versão 2).
+ * Classe central que gerencia o estado do jogo.
  */
 public class GameLogic {
     
@@ -22,16 +19,16 @@ public class GameLogic {
         CIMA, BAIXO, ESQUERDA, DIREITA
     }
 
-    // === ATRIBUTOS PRINCIPAIS ===
+    // === ATRIBUTOS ===
     private ArrayList<Celula> tabuleiro;
     private final int TAMANHO_TABULEIRO = 9; // 3x3
     private int posicaoJogador;
 
-    // Geradores e Dificuldade (V1)
+    // Geradores e Dificuldade
     private Random random;
     private int nivelDificuldade;
 
-    // Estado do Jogo (V2)
+    // Estado do Jogo
     private boolean partidaAtiva;
     private int pontuacaoFinal = 0;
 
@@ -40,14 +37,11 @@ public class GameLogic {
         this.tabuleiro = new ArrayList<>(TAMANHO_TABULEIRO);
         this.random = new Random(); 
         this.nivelDificuldade = 0;
-        this.partidaAtiva = true; // O jogo começa ativo
+        this.partidaAtiva = true;
         iniciarTabuleiro();
     }
 
-    // === INICIALIZAÇÃO (Baseada na V1 para ser aleatória) ===
-    /**
-     * Prepara o tabuleiro com monstros e itens aleatórios.
-     */
+    // === INICIALIZAÇÃO ===
     public void iniciarTabuleiro() {
         this.partidaAtiva = true;
         this.nivelDificuldade = 0;
@@ -59,69 +53,58 @@ public class GameLogic {
             tabuleiro.add(new Celula());
         }
 
-        // 2. Adiciona o jogador no centro
+        // 2. Adiciona o jogador no centro (Posição 4)
         tabuleiro.get(4).setEntidade(new Cavaleiro("Sir Doce"));
         this.posicaoJogador = 4;
 
-        // 3. Define posições para spawn aleatório
-        List<Integer> posicoesLivres = new ArrayList<>();
-        for (int i = 0; i < TAMANHO_TABULEIRO; i++) {
-            if (i != 4) posicoesLivres.add(i); // Tudo exceto o jogador
-        }
-        Collections.shuffle(posicoesLivres, this.random);
+        // 3. Adiciona monstros iniciais (CORRIGIDO: Passando o nível 0)
+        tabuleiro.get(1).setEntidade(new UrsoDeGoma(this.nivelDificuldade));
+        tabuleiro.get(7).setEntidade(new SoldadoGengibre(this.nivelDificuldade));
 
-        // 4. Spawna Monstros e Itens (2 de cada)
-        int numMonstros = 2;
-        int numItens = 2;
-        
-        for(int i = 0; i < numMonstros && !posicoesLivres.isEmpty(); i++) {
-            int pos = posicoesLivres.remove(0);
-            tabuleiro.get(pos).setEntidade(getMonstroAleatorio(this.nivelDificuldade));
-        }
-        
-        for(int i = 0; i < numItens && !posicoesLivres.isEmpty(); i++) {
-            int pos = posicoesLivres.remove(0);
-            tabuleiro.get(pos).setItem(getItemAleatorio(this.nivelDificuldade));
-        }
+        // 4. Adiciona itens iniciais
+        tabuleiro.get(3).setItem(new EspadaDeAlcacuz(this.nivelDificuldade)); 
+        tabuleiro.get(5).setItem(new PocaoDeCalda(this.nivelDificuldade));
         
         System.out.println("Novo jogo iniciado! Dificuldade: " + nivelDificuldade);
     }
 
-    // === LÓGICA DE MOVIMENTO (Mecânica de "Puxar" da V1 + Checks da V2) ===
-    
-    public int tentarMoverJogador(Direcao direcao) {
-        // Verifica se o jogo acabou (V2)
+    // === LÓGICA DE MOVIMENTO ===
+    public void tentarMoverJogador(Direcao direcao) {
         if (!this.partidaAtiva) {
             System.out.println("A partida acabou. Reinicie o jogo.");
-            return -1;
+            return;
         }
 
-        int proximaPosicao = -1;
         int posAtual = this.posicaoJogador;
+        int proximaPosicao = -1;
         int posicaoOposta = -1; 
         boolean opostaValida = false; 
 
-        // Cálculo de destino e posição oposta (para preencher o vazio)
+        // Lógica para calcular destino e posição oposta (para o "spawn" de novos inimigos)
         switch (direcao) {
             case CIMA:
-                if (posAtual < 3) return -1; // Borda
-                proximaPosicao = posAtual - 3;
-                if (posAtual <= 5) { posicaoOposta = posAtual + 3; opostaValida = true; }
+                if (posAtual >= 3) { 
+                    proximaPosicao = posAtual - 3;
+                    if (posAtual <= 5) { posicaoOposta = posAtual + 3; opostaValida = true; }
+                }
                 break;
             case BAIXO:
-                if (posAtual > 5) return -1; // Borda
-                proximaPosicao = posAtual + 3;
-                if (posAtual >= 3) { posicaoOposta = posAtual - 3; opostaValida = true; }
+                if (posAtual <= 5) { 
+                    proximaPosicao = posAtual + 3;
+                    if (posAtual >= 3) { posicaoOposta = posAtual - 3; opostaValida = true; }
+                }
                 break;
             case ESQUERDA:
-                if (posAtual % 3 == 0) return -1; // Borda
-                proximaPosicao = posAtual - 1;
-                if (posAtual % 3 != 2) { posicaoOposta = posAtual + 1; opostaValida = true; }
+                if (posAtual % 3 != 0) { 
+                    proximaPosicao = posAtual - 1;
+                    if (posAtual % 3 != 2) { posicaoOposta = posAtual + 1; opostaValida = true; }
+                }
                 break;
             case DIREITA:
-                if (posAtual % 3 == 2) return -1; // Borda
-                proximaPosicao = posAtual + 1;
-                if (posAtual % 3 != 0) { posicaoOposta = posAtual - 1; opostaValida = true; }
+                if (posAtual % 3 != 2) { 
+                    proximaPosicao = posAtual + 1;
+                    if (posAtual % 3 != 0) { posicaoOposta = posAtual - 1; opostaValida = true; }
+                }
                 break;
         }
 
@@ -131,40 +114,32 @@ public class GameLogic {
             
             Cavaleiro jogador = (Cavaleiro) tabuleiro.get(this.posicaoJogador).getEntidade();
 
-            // Verifica se morreu após interação (Lógica V2)
+            // Verifica Game Over
             if (jogador == null || !jogador.estaVivo()) {
                 encerrarPartida();
-                return -1;
+                return;
             } 
-            
-            
 
-            // Se moveu com sucesso, executa a lógica de "PUXAR" o tabuleiro (V1)
-            if (jogadorMoveu) {
-                this.nivelDificuldade++; // Aumenta desafio
+            // Lógica de "Puxar" o tabuleiro (Spawnar novos inimigos nas costas do jogador)
+            if (jogadorMoveu && opostaValida) {
+                this.nivelDificuldade++; // Aumenta dificuldade a cada passo
                 
-                if (opostaValida) {
-                    // Puxa a célula oposta para onde o jogador estava
-                    Celula celulaOposta = tabuleiro.get(posicaoOposta);
-                    Celula celulaVazia = tabuleiro.get(posAtual); 
-                    
-                    celulaVazia.setEntidade(celulaOposta.getEntidade());
-                    celulaVazia.setItem(celulaOposta.getItem());
-                    
-                    // Gera novo conteúdo na borda que ficou vazia
-                    celulaOposta.limparEntidade();
-                    celulaOposta.limparItem();
-                    gerarConteudoAleatorio(celulaOposta);
-                    
-                    return posicaoOposta; 
-                }
-                return -2; // Moveu mas sem puxar (raro neste grid)
+                Celula celulaOposta = tabuleiro.get(posicaoOposta);
+                Celula celulaVazia = tabuleiro.get(posAtual); // Onde o jogador estava
+                
+                // Puxa o conteúdo da ponta para o centro
+                celulaVazia.setEntidade(celulaOposta.getEntidade());
+                celulaVazia.setItem(celulaOposta.getItem());
+                
+                // Gera novo monstro/item na borda que ficou vazia
+                celulaOposta.limparEntidade();
+                celulaOposta.limparItem();
+                gerarConteudoAleatorio(celulaOposta);
             }
+        } else {
+            System.out.println("Movimento inválido (Borda).");
         }
-        return -1;
     }
-
-    // === INTERAÇÃO E COMBATE (Fusão V1 e V2) ===
     
     private boolean processarInteracao(int proximaPosicao, int posicaoAntiga) {
         Celula celulaAtual = tabuleiro.get(posicaoAntiga); 
@@ -174,7 +149,6 @@ public class GameLogic {
         // 1. Interage com ITEM
         if (celulaDestino.temItem()) {
             Coletavel item = celulaDestino.getItem();
-            System.out.println(jogador.getNome() + " usou " + item.getNome() + "!");
             item.usar(jogador);
             celulaDestino.limparItem(); 
         }
@@ -184,63 +158,52 @@ public class GameLogic {
             EntidadeJogo monstro = celulaDestino.getEntidade();
             System.out.println("Encontro com " + monstro.getNome() + "!");
 
-            // COMBATE: Lógica Fundida
             if (jogador.getArmado()) {
-                // Lógica V2: Arma pode quebrar ou perder ataque
-                System.out.println("Ataque armado!");
+                // Combate com arma
                 jogador.atacar(monstro);
                 
-                // Acessando a arma para ver se quebra (Lógica V2)
+                // Reduz dano da arma ou quebra
                 if(jogador.getArma().getAtaque() < monstro.getPontosDeVidaAtuais()){
-                    // Reduz o dano da arma baseado na vida do monstro
-                    int novoAtaque = jogador.getArma().getAtaque() - monstro.getPontosDeVidaAtuais();
-                    // Nota: O método setAtaque precisa existir na sua classe Arma, ou criar nova arma
-                    // Assumindo que existe um método ou lógica para atualizar:
-                     jogador.getArma().setAtaque(novoAtaque, jogador); 
+                    int novoAtaque = Math.max(1, jogador.getArma().getAtaque() - 2); // Perde fio
+                    jogador.getArma().setAtaque(novoAtaque, jogador); 
                 } else {
-                    // Arma quebra
-                    System.out.println("A arma quebrou no impacto!");
-                    jogador.getArma().quebrar(jogador);
+                    jogador.getArma().quebrar(jogador); // Quebra se matar hitkill (exemplo)
                 }
 
             } else {
-                // Lógica V2: Checa Escudo de Troca
+                // Combate desarmado ou Esquiva
                 if (jogador.isEscudoDeTrocaAtivo()) {
-                    System.out.println("Escudo de Troca ativado! Trocando de lugar com o monstro.");
-                    celulaAtual.setEntidade(monstro); // Monstro vai para onde o jogador estava
-                    celulaDestino.setEntidade(jogador); // Jogador vai para o destino
+                    System.out.println("Escudo de Troca! Trocando de lugar com o monstro.");
+                    celulaAtual.setEntidade(monstro);
+                    celulaDestino.setEntidade(jogador);
                     this.posicaoJogador = proximaPosicao;
-                    jogador.desativarEscudoDeTroca();
-                    return true; // Jogador moveu (troca especial)
+                    return true; 
                 } 
                 
-                // Lógica V1/V2: Sem arma e sem escudo -> Dano
-                System.out.println("Desarmado! Recebendo dano direto.");
-                jogador.receberDano(monstro.getPontosDeVidaAtuais());
-                
-                if (jogador.estaVivo()) {
-                    monstro.setPontosDeVidaAtuais(0); // Jogador sobreviveu, monstro morre
-                }
+                // Toma dano
+                monstro.atacar(jogador);
             }
 
-            // PÓS-COMBATE
+            // Se venceu
             if (!monstro.estaVivo()) {
                 System.out.println("Monstro derrotado!");
+                if (monstro instanceof MonstroDoce) {
+                    jogador.coletarDinheiro(((MonstroDoce)monstro).getRecompensaEmDinheiro());
+                }
                 celulaDestino.limparEntidade();
                 
-                if (jogador.estaVivo()) {
-                    // Move jogador
-                    celulaDestino.setEntidade(jogador);
-                    celulaAtual.limparEntidade();
-                    this.posicaoJogador = proximaPosicao;
-                    return true; // Sucesso
-                }
+                // Move jogador
+                celulaDestino.setEntidade(jogador);
+                celulaAtual.limparEntidade();
+                this.posicaoJogador = proximaPosicao;
+                
+                return true;
             }
             
-            return false; // Jogador não avançou (ou morreu, ou monstro não morreu)
+            return false; // Não moveu (luta continua ou morreu)
             
         } else {
-            // 3. Célula VAZIA (Movimento simples)
+            // 3. Célula VAZIA
             celulaDestino.setEntidade(jogador); 
             celulaAtual.limparEntidade();       
             this.posicaoJogador = proximaPosicao; 
@@ -248,17 +211,16 @@ public class GameLogic {
         }
     }
 
-    // === AUXILIARES DE GERAÇÃO (V1) ===
+    // === GERADORES ===
     
     private void gerarConteudoAleatorio(Celula celula) {
         int roll = random.nextInt(10); // 0 a 9
         if (roll < 4) { // 40% Monstro
             celula.setEntidade(getMonstroAleatorio(this.nivelDificuldade));
-        } else if (roll < 8) { // 40% Item
+        } else if (roll < 7) { // 30% Item
             celula.setItem(getItemAleatorio(this.nivelDificuldade));
-        } else { // 20% Vazio
-            celula.limparEntidade(); celula.limparItem();
-        }
+        } 
+        // 30% Vazio
     }
 
     private MonstroDoce getMonstroAleatorio(int nivel) {
@@ -271,28 +233,25 @@ public class GameLogic {
     }
 
     private Coletavel getItemAleatorio(int nivel) {
-        int tipo = random.nextInt(3); // 0, 1 ou 2
+        int tipo = random.nextInt(3); 
         switch (tipo) {
             case 0: return new PocaoDeCalda(nivel);
             case 1: return new EspadaDeAlcacuz(nivel); 
-            default: return new EscudoDeGoma(nivel); // Adicionei o Escudo aqui
+            default: return new EscudoDeGoma(nivel);
         }
     }
 
-    // === ESTADO DO JOGO (V2) ===
-
     public void encerrarPartida(){
        this.partidaAtiva = false;
-       Cavaleiro jogador = (Cavaleiro)this.tabuleiro.get(posicaoJogador).getEntidade();
-       if (jogador != null) {
-           this.pontuacaoFinal = jogador.getDinheiro(); // Assumindo que dinheiro é score
+       // Tenta recuperar jogador para pegar pontuação, se ainda existir na referência
+       if (posicaoJogador >= 0 && posicaoJogador < TAMANHO_TABULEIRO) {
+           EntidadeJogo ent = tabuleiro.get(posicaoJogador).getEntidade();
+           if (ent instanceof Cavaleiro) {
+               this.pontuacaoFinal = ((Cavaleiro)ent).getDinheiro();
+           }
        }
        System.out.println("=== GAME OVER ===");
        System.out.println("Pontuação Final: " + this.pontuacaoFinal);
-    }
-
-    public boolean isPartidaAtiva() {
-        return partidaAtiva;
     }
 
     public ArrayList<Celula> getTabuleiro() {
