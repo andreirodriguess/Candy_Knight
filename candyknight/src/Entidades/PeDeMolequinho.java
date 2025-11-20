@@ -13,16 +13,10 @@ public class PeDeMolequinho extends MonstroDoce {
     private boolean estaDividido;
     private int vidaFase2;
 
-    public PeDeMolequinho(int nivelDificuldade) {
-        super(
-            "Pé de Molequinho Duro", 
-            5 + (nivelDificuldade * 2), // Vida Fase 1 (Base 5)
-            3 + (nivelDificuldade * 1), // Força (Base 3)
-            15 + (nivelDificuldade * 5)
-        );
-        
-        // A vida dos fragmentos (Fase 2)
-        this.vidaFase2 = 3 + (nivelDificuldade * 1); // Base 3
+    public PeDeMolequinho() {
+        // (Nome, VidaFase1, Forca, Recompensa)
+        super("Pé de Molequinho Duro", 60, 10, 30);
+        this.vidaFase2 = 40; // Vida total dos dois fragmentos juntos
         this.estaDividido = false;
     }
 
@@ -38,6 +32,12 @@ public class PeDeMolequinho extends MonstroDoce {
         alvo.receberDano(this.getPotencia());
     }
 
+    /**
+     * Sobrescreve o método base para implementar a divisão.
+     * Isso REQUER que a classe EntidadeJogo tenha os métodos:
+     * - setPontosDeVidaAtuais(int valor)
+     * - setPontosDeVidaMax(int valor)
+     */
     @Override
     public void receberDano(int quantidade) {
         if (!this.estaVivo()) return;
@@ -47,33 +47,41 @@ public class PeDeMolequinho extends MonstroDoce {
         System.out.println(this.getNome() + " recebeu " + quantidade + " de dano!");
 
         if (vidaAtual <= 0) {
+            // Monstro foi derrotado
             if (!estaDividido) {
+                // Estava na Fase 1, agora transiciona para a Fase 2
                 System.out.println(this.getNome() + " se quebra e se divide em dois fragmentos!");
                 this.estaDividido = true;
                 
-                // Configura status da Fase 2
+                // Define a nova vida máxima e cura totalmente para a Fase 2
+                // (Assumindo que os setters existem em EntidadeJogo)
                 this.setPontosDeVidaMax(this.vidaFase2); 
                 this.setPontosDeVidaAtuais(this.vidaFase2);
-                this.setNome("Fragmentos de Pé de Moleque");
+                this.setNome("Fragmentos de Pé de Moleque"); // Muda o nome
 
-                // Dano excedente (Overkill) passa para a próxima fase
-                int danoExcedente = Math.abs(vidaAtual); 
+                // Se o dano foi maior (ex: 70 de dano em 60 de vida), 
+                // o dano excedente (10) é aplicado à Fase 2.
+                int danoExcedente = Math.abs(vidaAtual); // vidaAtual é negativa (ex: -10)
                 if (danoExcedente > 0) {
                     System.out.println("O dano excedente atinge os fragmentos!");
-                    this.receberDano(danoExcedente); 
+                    this.receberDano(danoExcedente); // Chama recursivamente para a Fase 2
                 }
 
             } else {
+                // Estava na Fase 2 e foi derrotado
                 this.setPontosDeVidaAtuais(0);
-                this.morrer(); 
+                this.morrer(); // Chama a morte definitiva
             }
         } else {
+            // Apenas recebeu dano normal
             this.setPontosDeVidaAtuais(vidaAtual);
         }
     }
 
     @Override
     public void morrer() {
+        // Este método só é chamado pela lógica acima quando o monstro
+        // é derrotado na Fase 2.
         System.out.println(this.getNome() + " foi totalmente esfarelado!");
     }
 }
