@@ -177,6 +177,17 @@ public class GameLogic {
 
             // Se o monstro foi derrotado
             if (!monstro.estaVivo()) {
+                
+                // VERIFICAÇÃO ESPECIAL: É O BOSS?
+            if (monstro instanceof Entidades.PeDeMolequinho) {
+                System.out.println(">>> AVISO: O monstro se dividiu em fragmentos perigosos!");
+                
+                // Em vez de limpar a célula, substituímos pelo monstro da Fase 2
+                celulaDestino.setEntidade(new Entidades.PeDeMolequinhoFase2());
+                
+                // NÃO MOVE O JOGADOR (jogadorSaiuDaCasa continua false)
+                // O jogador fica onde está e agora tem um novo inimigo na frente dele.
+            } else {
                 System.out.println(jogador.getNome() + " derrotou " + monstro.getNome() + "!");
                 celulaDestino.limparEntidade(); // Limpa o monstro
                 
@@ -189,6 +200,7 @@ public class GameLogic {
                 this.posicaoJogador = proximaPosicao; // ATUALIZA a posição do jogador
                 // +++ FIM MODIFICAÇÃO (REGRA 2) +++
             }
+        }
             
             
         } else {
