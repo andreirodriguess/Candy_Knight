@@ -78,7 +78,4 @@ public class ScreenMenu extends JLayeredPane {
         // 6. Adiciona o botão à camada SUPERIOR
         this.add(buttonExit, JLayeredPane.PALETTE_LAYER);
     }
-
 }
-
-
