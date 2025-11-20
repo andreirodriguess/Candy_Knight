@@ -58,6 +58,7 @@ public class GameLogic {
         // 3. Adiciona monstros (ex: posições 1 e 7)
         tabuleiro.get(1).setEntidade(new Entidades.UrsoDeGoma());
         tabuleiro.get(7).setEntidade(new Entidades.SoldadoGengibre());
+        tabuleiro.get(8).setEntidade(new Entidades.PeDeMolequinho());
 
         // 4. Adiciona itens (ex: posições 3 e 5)
         // (Adicionei a EspadaDeAlcacuz para testar a tua correção!)
@@ -168,7 +169,7 @@ public class GameLogic {
                 }else{
                     //caso não tenha escudo, monstro morre, jogador anda, jogador perde vida = 
                     jogador.receberDano(monstro.getPontosDeVidaAtuais());
-                    monstro.receberDano(monstro.getPontosDeVidaAtuais());//monstro morre quando atacado pelo jogador
+                    monstro.receberDano(monstro.getPontosDeVidaAtuais());
                     celulaDestino.limparEntidade();//limpa celula do monstro
 //                    celulaDestino.setEntidade(jogador); // Coloca o jogador na nova célula
 //                    celulaAtual.limparEntidade();  //Retira o jogador da celula antiga
@@ -180,8 +181,6 @@ public class GameLogic {
 
             // Se o monstro foi derrotado
             if (!monstro.estaVivo()) {
-                System.out.println(jogador.getNome() + " derrotou " + monstro.getNome() + "!");
-                celulaDestino.limparEntidade(); // Limpa o monstro
                 
                 // +++ INÍCIO MODIFICAÇÃO (REGRA 2: Movimento pós-vitória) +++
                 
@@ -200,7 +199,29 @@ public class GameLogic {
                 celulaDestino.setItem(moedaDrop);
                 System.out.println("O monstro deixou cair uma moeda de valor " + moedaDrop.getValor() + "!");
                 
+                    // VERIFICAÇÃO ESPECIAL: É O PÉ DE MOLEQUINHO?
+                if (monstro instanceof Entidades.PeDeMolequinho) {
+                    System.out.println(">>> AVISO: O monstro se dividiu em fragmentos perigosos!");
+
+                    // Em vez de limpar a célula, substituímos pelo monstro da Fase 2
+                    celulaDestino.setEntidade(new Entidades.PeDeMolequinhoFase2());
+
+                    // NÃO MOVE O JOGADOR (jogadorSaiuDaCasa continua false)
+                    // O jogador fica onde está e agora tem um novo inimigo na frente dele.
+                } else {
+                        System.out.println(jogador.getNome() + " derrotou " + monstro.getNome() + "!");
+                        celulaDestino.limparEntidade(); // Limpa o monstro
+
+                        // +++ INÍCIO MODIFICAÇÃO (REGRA 2: Movimento pós-vitória) +++
+                        System.out.println(jogador.getNome() + " toma a posição do monstro!");
+
+                        // (Esta é a mesma lógica de movimento da secção "else" abaixo)
+                        celulaDestino.setEntidade(jogador); // Coloca o jogador na nova célula
+                        celulaAtual.limparEntidade();       // Limpa o jogador da célula antiga
+                        this.posicaoJogador = proximaPosicao; // ATUALIZA a posição do jogador
+                        // +++ FIM MODIFICAÇÃO (REGRA 2) +++
             }
+        }
             
             
         } else {
