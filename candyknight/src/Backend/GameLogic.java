@@ -210,15 +210,15 @@ public class GameLogic {
                     // O jogador fica onde está e agora tem um novo inimigo na frente dele.
                 } else {
                         System.out.println(jogador.getNome() + " derrotou " + monstro.getNome() + "!");
-                        celulaDestino.limparEntidade(); // Limpa o monstro
+                        //celulaDestino.limparEntidade(); // Limpa o monstro
 
                         // +++ INÍCIO MODIFICAÇÃO (REGRA 2: Movimento pós-vitória) +++
                         System.out.println(jogador.getNome() + " toma a posição do monstro!");
 
                         // (Esta é a mesma lógica de movimento da secção "else" abaixo)
-                        celulaDestino.setEntidade(jogador); // Coloca o jogador na nova célula
-                        celulaAtual.limparEntidade();       // Limpa o jogador da célula antiga
-                        this.posicaoJogador = proximaPosicao; // ATUALIZA a posição do jogador
+                        //celulaDestino.setEntidade(jogador); // Coloca o jogador na nova célula
+                        //celulaAtual.limparEntidade();       // Limpa o jogador da célula antiga
+                        //this.posicaoJogador = proximaPosicao; // ATUALIZA a posição do jogador
                         // +++ FIM MODIFICAÇÃO (REGRA 2) +++
             }
         }
