@@ -1,3 +1,0 @@
-candyknight.Interface.GameBackground$1
-candyknight.Interface.GameBackground$2
-candyknight.Interface.GameBackground
