@@ -16,43 +16,21 @@ public class Cavaleiro extends EntidadeJogo {
     // NOVOS CAMPOS PARA O ESCUDO
     private boolean escudoDeTrocaAtivo;
     private int duracaoEscudo;
-    
-    private int potenciaBase; // Guarda o dano original
 
     public Cavaleiro(String nome) {
-        // +++ MUDANÇA: Vida 100 -> 10, Dano base 15 -> 1 +++
-        super(nome, 10, 1);
+        super(nome, 100, 15);
         this.dinheiro = 0;
         
+        // Inicializa os novos campos
         this.escudoDeTrocaAtivo = false;
         this.duracaoEscudo = 0;
-        
-        this.potenciaBase = this.getPotencia(); // Guarda o valor 1 (dano desarmado)
     }
 
     public void atacar(EntidadeJogo alvo) {
         if (!alvo.estaVivo()) return;
 
         System.out.println(this.getNome() + " ataca " + alvo.getNome() + " com sua Espada Doce!");
-
-        int danoDisponivel = this.getPotencia(); 
-        int vidaMonstro = alvo.getPontosDeVidaAtuais();
-
-        int danoACausar = Math.min(danoDisponivel, vidaMonstro);
-
-        alvo.receberDano(danoACausar);
-
-        int poolRestante = danoDisponivel - danoACausar;
-        this.setPotencia(poolRestante);
-
-        if (poolRestante <= 0) {
-            System.out.println("A arma perdeu todo o seu poder!");
-            this.setArmado(false);
-            this.setPotencia(this.potenciaBase); // Reseta para o dano base desarmado
-            System.out.println(this.getNome() + " está desarmado! Potência revertida para " + this.potenciaBase + ".");
-        } else {
-            System.out.println("Pontos de dano restantes na arma: " + poolRestante);
-        }
+        alvo.receberDano(this.getPotencia());
     }
 
     public void morrer() {

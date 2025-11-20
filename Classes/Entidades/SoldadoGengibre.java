@@ -9,24 +9,15 @@ package candyknight.Entidades;
  */
 public class SoldadoGengibre extends MonstroDoce {
 
-    // +++ MUDANÇA: Construtor aceita nível de dificuldade +++
-    public SoldadoGengibre(int nivel) {
-        // +++ MUDANÇA: Valores base reduzidos (35->4, 2->1) +++
-        int vidaBase = 4; // 3.5 arredondado para 4
-        int recompensaBase = 1;
-        
-        // +++ MUDANÇA: Lógica de scaling +++
-        // Aumenta a vida em 1 a cada 3 níveis
-        int vidaAjustada = vidaBase + (nivel / 3);
-        
-        super("Soldado de Gengibre", vidaAjustada, recompensaBase);
+    public SoldadoGengibre() {
+        super("Soldado de Gengibre", 50, 8, 20);
     }
 
     public void atacar(EntidadeJogo alvo) {
         if (!alvo.estaVivo()) return;
         
         System.out.println(this.getNome() + " golpeia com seu bastão de açúcar!");
-        alvo.receberDano(this.getPontosDeVidaAtuais());
+        alvo.receberDano(this.getPotencia());
     }
 
     public void morrer() {

@@ -43,7 +43,6 @@ public abstract class EntidadeJogo {
 
     public String getNome() { return nome; }
     public int getPontosDeVidaAtuais() { return pontosDeVidaAtuais; }
-    public int getPontosDeVidaMax() { return pontosDeVidaMax;}
     public int getPotencia() { return potencia; }
     public boolean estaVivo() { return this.pontosDeVidaAtuais > 0; }
     // ... (depois dos seus métodos get)
@@ -66,7 +65,7 @@ public abstract class EntidadeJogo {
     }
 
     // Necessário para PeDeMolequinho (Fase 2)
-    public void setPontosDeVidaAtuais(int valor) {
+    protected void setPontosDeVidaAtuais(int valor) {
         if (valor < 0) {
             this.pontosDeVidaAtuais = 0;
         } else if (valor > this.pontosDeVidaMax) {

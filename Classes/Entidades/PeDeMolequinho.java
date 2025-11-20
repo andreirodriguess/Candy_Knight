@@ -13,20 +13,10 @@ public class PeDeMolequinho extends MonstroDoce {
     private boolean estaDividido;
     private int vidaFase2;
 
-    // +++ MUDANÇA: Construtor aceita nível de dificuldade +++
-    public PeDeMolequinho(int nivel) {
-        // +++ MUDANÇA: Valores base reduzidos +++
-        int vidaBaseFase1 = 2; // 15 -> 1.5 -> 2
-        int vidaBaseFase2 = 4; // 40 -> 4
-        int recompensaBase = 1; // 3 -> 1
-        
-        // +++ MUDANÇA: Lógica de scaling +++
-        // Aumenta a vida em 1 a cada 3 níveis
-        int vidaAjustadaFase1 = vidaBaseFase1 + (nivel / 3);
-        int vidaAjustadaFase2 = vidaBaseFase2 + (nivel / 3);
-
-        super("Pé de Molequinho Duro", vidaAjustadaFase1, recompensaBase);
-        this.vidaFase2 = vidaAjustadaFase2; // Define a vida da Fase 2 ajustada
+    public PeDeMolequinho() {
+        // (Nome, VidaFase1, Forca, Recompensa)
+        super("Pé de Molequinho Duro", 60, 10, 30);
+        this.vidaFase2 = 40; // Vida total dos dois fragmentos juntos
         this.estaDividido = false;
     }
 
@@ -39,11 +29,14 @@ public class PeDeMolequinho extends MonstroDoce {
         } else {
             System.out.println(this.getNome() + " ataca com um chute duplo de amendoim!");
         }
-        alvo.receberDano(this.getPontosDeVidaAtuais());
+        alvo.receberDano(this.getPotencia());
     }
 
     /**
      * Sobrescreve o método base para implementar a divisão.
+     * Isso REQUER que a classe EntidadeJogo tenha os métodos:
+     * - setPontosDeVidaAtuais(int valor)
+     * - setPontosDeVidaMax(int valor)
      */
     @Override
     public void receberDano(int quantidade) {
@@ -60,21 +53,24 @@ public class PeDeMolequinho extends MonstroDoce {
                 System.out.println(this.getNome() + " se quebra e se divide em dois fragmentos!");
                 this.estaDividido = true;
                 
-                // Define a nova vida máxima (já calculada no construtor)
+                // Define a nova vida máxima e cura totalmente para a Fase 2
+                // (Assumindo que os setters existem em EntidadeJogo)
                 this.setPontosDeVidaMax(this.vidaFase2); 
                 this.setPontosDeVidaAtuais(this.vidaFase2);
-                this.setNome("Fragmentos de Pé de Moleque"); 
+                this.setNome("Fragmentos de Pé de Moleque"); // Muda o nome
 
-                int danoExcedente = Math.abs(vidaAtual); 
+                // Se o dano foi maior (ex: 70 de dano em 60 de vida), 
+                // o dano excedente (10) é aplicado à Fase 2.
+                int danoExcedente = Math.abs(vidaAtual); // vidaAtual é negativa (ex: -10)
                 if (danoExcedente > 0) {
                     System.out.println("O dano excedente atinge os fragmentos!");
-                    this.receberDano(danoExcedente); 
+                    this.receberDano(danoExcedente); // Chama recursivamente para a Fase 2
                 }
 
             } else {
                 // Estava na Fase 2 e foi derrotado
                 this.setPontosDeVidaAtuais(0);
-                this.morrer(); 
+                this.morrer(); // Chama a morte definitiva
             }
         } else {
             // Apenas recebeu dano normal
@@ -84,6 +80,8 @@ public class PeDeMolequinho extends MonstroDoce {
 
     @Override
     public void morrer() {
+        // Este método só é chamado pela lógica acima quando o monstro
+        // é derrotado na Fase 2.
         System.out.println(this.getNome() + " foi totalmente esfarelado!");
     }
 }

@@ -14,21 +14,13 @@ public class PocaoDeCalda implements Coletavel {
 
     private int cura;
 
-    // +++ MUDANÇA: Construtor aceita nível de dificuldade +++
-    public PocaoDeCalda(int nivel) {
-        // +++ MUDANÇA: Valor base reduzido (25 -> 2.5 -> 3) +++
-        int curaBase = 3;
-        
-        // +++ MUDANÇA: Lógica de scaling +++
-        // Aumenta a cura em 1 a cada 4 níveis
-        this.cura = curaBase + (nivel / 4);
+    public PocaoDeCalda() {
+        this.cura = 25;
     }
-    
     @Override
     public String getNome() {
         return "Poção de Calda de Morango";
     }
-    
     @Override
     public void usar(Cavaleiro cavaleiro) {
         System.out.println(cavaleiro.getNome() + " usou " + this.getNome() + "!");
