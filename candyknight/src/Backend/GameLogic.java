@@ -166,6 +166,7 @@ public class GameLogic {
                 }else{
                     //caso não tenha escudo, monstro morre, jogador anda, jogador perde vida = 
                     jogador.receberDano(monstro.getPontosDeVidaAtuais());
+                    monstro.receberDano(monstro.getPontosDeVidaAtuais());//monstro morre quando atacado pelo jogador
                     celulaDestino.limparEntidade();//limpa celula do monstro
                     celulaDestino.setEntidade(jogador); // Coloca o jogador na nova célula
                     celulaAtual.limparEntidade();  //Retira o jogador da celula antiga
