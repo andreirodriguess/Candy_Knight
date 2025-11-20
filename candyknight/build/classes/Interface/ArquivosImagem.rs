@@ -1,1 +1,0 @@
-candyknight.Interface.ArquivosImagem
