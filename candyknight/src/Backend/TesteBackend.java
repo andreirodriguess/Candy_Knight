@@ -2,116 +2,114 @@ package Backend;
 
 // Importa as classes necessárias
 import Backend.Celula;
-import Entidades.Cavaleiro;
-import Entidades.MonstroDoce;
-import Entidades.EntidadeJogo;
+import Coletaveis.Coletavel; // Importante para ver os itens
+import Entidades.*;        // Importa todas as entidades para podermos distinguir
 import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- * Esta classe é um "testador de backend".
- * Ela permite-te jogar o jogo através da consola,
- * sem depender da interface gráfica (Swing).
+ * Versão MELHORADA do testador.
+ * Mostra vida dos monstros e detalhes dos itens.
  */
 public class TesteBackend {
 
     public static void main(String[] args) {
         
-        // 1. Inicia a lógica do jogo e o leitor de consola
         GameLogic game = new GameLogic();
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("--- INICIANDO TESTE DE BACKEND (Candy Knight) ---");
-        System.out.println("Controla o Cavaleiro (C) movendo-o com 'c', 'b', 'e', 'd'.");
+        System.out.println("Legenda: [J]=Jogador, [U]=Urso, [S]=Soldado, [P]=PéDeMoleque, [I]=Item");
+        System.out.println("Os números ao lado das letras são a VIDA atual.");
 
-        // 2. Loop principal do jogo
-        while (true) {
+        // Loop principal
+        while (game.getPartidaAtivo()) { // Verifica se o jogo ainda está ativo
             
-            // 3. Desenha o tabuleiro na consola
-            imprimirTabuleiro(game);
+            imprimirTabuleiroDetalhado(game);
 
-            // 4. Pede a próxima jogada (SEÇÃO MODIFICADA)
-            System.out.print("\nMover (c=cima, b=baixo, e=esquerda, d=direita): ");
-            String input = scanner.next().toLowerCase(); // Pega a string e põe em minúsculas
+            System.out.print("\nMover (c=cima, b=baixo, e=esquerda, d=direita, s=sair): ");
+            String input = scanner.next().toLowerCase();
 
             GameLogic.Direcao direcaoEscolhida = null;
 
-            // Converte a string de input para o nosso Enum
-            switch (input) {
-                case "c":
-                    direcaoEscolhida = GameLogic.Direcao.CIMA;
-                    break;
-                case "b":
-                    direcaoEscolhida = GameLogic.Direcao.BAIXO;
-                    break;
-                case "e":
-                    direcaoEscolhida = GameLogic.Direcao.ESQUERDA;
-                    break;
-                case "d":
-                    direcaoEscolhida = GameLogic.Direcao.DIREITA;
-                    break;
-                default:
-                    System.out.println("Comando inválido. Use 'c', 'b', 'e' ou 'd'.");
-                    continue; // Pula o resto do loop e pede de novo
+            if (input.equals("s")) {
+                break; // Opção para sair manualmente
             }
 
-            // 5. Executa a lógica do jogo
+            switch (input) {
+                case "c": direcaoEscolhida = GameLogic.Direcao.CIMA; break;
+                case "b": direcaoEscolhida = GameLogic.Direcao.BAIXO; break;
+                case "e": direcaoEscolhida = GameLogic.Direcao.ESQUERDA; break;
+                case "d": direcaoEscolhida = GameLogic.Direcao.DIREITA; break;
+                default:
+                    System.out.println("Comando inválido.");
+                    continue;
+            }
+
             System.out.println("\n--- AÇÃO ---");
-            // Chama o NOVO método com o Enum
             if (direcaoEscolhida != null) {
                 game.tentarMoverJogador(direcaoEscolhida);
-                
             }
             System.out.println("--------------\n");
-            
-            // (Aqui podes adicionar uma condição de "Game Over")
         }
+        
+        System.out.println("FIM DE JOGO! O loop encerrou.");
+        scanner.close();
     }
 
     /**
-     * Método auxiliar para imprimir o tabuleiro 3x3 na consola.
-     * @param game A instância da GameLogic atual.
+     * Imprime o tabuleiro mostrando QUEM é o monstro e a VIDA dele.
+     * Isso ajuda a testar se o 'fortalecer()' está funcionando.
      */
-    private static void imprimirTabuleiro(GameLogic game) {
+    private static void imprimirTabuleiroDetalhado(GameLogic game) {
         ArrayList<Celula> tabuleiro = game.getTabuleiro();
         
-        System.out.println("--- ESTADO DO TABULEIRO ---");
+        System.out.println("--- ESTADO DO TABULEIRO (Pontos: " + game.getPontucaoFinal() + ") ---");
         
         for (int i = 0; i < tabuleiro.size(); i++) {
             Celula celula = tabuleiro.get(i);
-            String representacao = "[ ";
+            String celulaStr = "[ ";
 
-            // Verifica se há uma entidade
+            // --- ENTIDADES ---
             if (celula.temEntidade()) {
-                EntidadeJogo entidade = celula.getEntidade();
-                if (entidade instanceof Cavaleiro) {
-                    representacao += "C"; // Cavaleiro
-                } else if (entidade instanceof MonstroDoce) {
-                    representacao += "M"; // Monstro
-                }
+                EntidadeJogo ent = celula.getEntidade();
+                // Mostra a inicial do nome e a vida entre parênteses
+                // Ex: J(100) ou U(15)
+                String inicial = ent.getNome().substring(0, 1);
+                
+                // Diferenciação visual rápida
+                if (ent instanceof Cavaleiro) inicial = "J"; // Jogador
+                else if (ent instanceof UrsoDeGoma) inicial = "U";
+                else if (ent instanceof SoldadoGengibre) inicial = "S";
+                else if (ent instanceof PeDeMolequinho) inicial = "P";
+                else if (ent instanceof PeDeMolequinhoFase2) inicial = "p"; // Fase 2 minúscula
+                
+                celulaStr += inicial + "(" + ent.getPontosDeVidaAtuais() + ")";
             } else {
-                representacao += " "; // Vazio
+                celulaStr += "     "; // Espaço vazio para alinhar
             }
 
-            representacao += " / ";
+            celulaStr += " | ";
 
-            // Verifica se há um item
+            // --- ITENS ---
             if (celula.temItem()) {
-                representacao += "I"; // Item
+                Coletavel item = celula.getItem();
+                // Mostra inicial do item
+                celulaStr += item.getNome().substring(0, 1);
             } else {
-                representacao += " "; // Vazio
+                celulaStr += " ";
             }
 
-            representacao += " ]";
+            celulaStr += " ]";
             
-            // Imprime a célula
-            System.out.print(representacao);
+            System.out.print(celulaStr);
 
-            // Quebra a linha a cada 3 células
+            // Quebra de linha a cada 3 células (Grid 3x3)
             if ((i + 1) % 3 == 0) {
-                System.out.println(); // Nova linha
+                System.out.println();
+                System.out.println("------------------------------------------");
             } else {
-                System.out.print("  "); // Espaçamento entre células
+                System.out.print("  ");
             }
         }
     }

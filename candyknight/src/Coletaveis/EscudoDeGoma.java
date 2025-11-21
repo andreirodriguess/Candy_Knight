@@ -22,4 +22,5 @@ public class EscudoDeGoma implements Coletavel {
     @Override
     public void fortalecer(int nivel) {
     }
+    
 }
