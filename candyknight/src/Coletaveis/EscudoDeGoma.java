@@ -19,5 +19,7 @@ public class EscudoDeGoma implements Coletavel {
         // Esta é a parte crucial. O Cavaleiro precisa deste método:
         cavaleiro.ativarEscudoDeTroca(duracaoEmMovimentos);
     }
-    
+    @Override
+    public void fortalecer(int nivel) {
+    }
 }

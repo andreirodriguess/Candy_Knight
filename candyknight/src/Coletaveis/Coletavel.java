@@ -14,4 +14,6 @@ public interface Coletavel {
     void usar(Cavaleiro cavaleiro);
     String getNome();
     
+    void fortalecer(int nivel);
+    
 }

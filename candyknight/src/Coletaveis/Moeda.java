@@ -25,5 +25,8 @@ public class Moeda implements Coletavel{
     public String getNome() {
         return "moeda";
     }
-    
+    @Override
+    public void fortalecer(int nivel) {
+      
+    }
 }
