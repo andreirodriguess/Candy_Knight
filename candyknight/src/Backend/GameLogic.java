@@ -163,22 +163,41 @@ public class GameLogic {
                 //Caso tenha escudo, troca de lugar com o monstro
                 if(jogador.isEscudoDeTrocaAtivo()){
                     celulaAtual.setEntidade(monstro);
+                    celulaDestino.setEntidade(jogador);
+                    this.posicaoJogador = proximaPosicao;
                     jogador.desativarEscudoDeTroca();
                 }else{
                     //caso não tenha escudo, monstro morre, jogador anda, jogador perde vida = 
                     jogador.receberDano(monstro.getPontosDeVidaAtuais());
                     monstro.receberDano(monstro.getPontosDeVidaAtuais());
                     celulaDestino.limparEntidade();//limpa celula do monstro
-                    celulaDestino.setEntidade(jogador); // Coloca o jogador na nova célula
-                    celulaAtual.limparEntidade();  //Retira o jogador da celula antiga
+//                    celulaDestino.setEntidade(jogador); // Coloca o jogador na nova célula
+//                    celulaAtual.limparEntidade();  //Retira o jogador da celula antiga
                 }
-                celulaDestino.setEntidade(jogador);
-                this.posicaoJogador = proximaPosicao;
+//                celulaDestino.setEntidade(jogador);
+//                this.posicaoJogador = proximaPosicao;
                 System.out.println(jogador.getNome() + " está desarmado e não pode atacar!");
             }
 
             // Se o monstro foi derrotado
             if (!monstro.estaVivo()) {
+                
+                // +++ INÍCIO MODIFICAÇÃO (REGRA 2: Movimento pós-vitória) +++
+                
+                // (Esta é a mesma lógica de movimento da secção "else" abaixo)
+//                celulaDestino.setEntidade(jogador); // Coloca o jogador na nova célula
+//                celulaAtual.limparEntidade();       // Limpa o jogador da célula antiga
+//                this.posicaoJogador = proximaPosicao; // ATUALIZA a posição do jogador
+                
+                Entidades.MonstroDoce monstroDoce = (Entidades.MonstroDoce) monstro;
+
+                // Cria a moeda
+                Coletaveis.Moeda moedaDrop = new Coletaveis.Moeda();
+                moedaDrop.setValor(monstroDoce.getRecompensaEmDinheiro()); // Define o valor baseado no monstro
+
+                // Coloca a moeda na célula onde o monstro morreu
+                celulaDestino.setItem(moedaDrop);
+                System.out.println("O monstro deixou cair uma moeda de valor " + moedaDrop.getValor() + "!");
                 
                     // VERIFICAÇÃO ESPECIAL: É O PÉ DE MOLEQUINHO?
                 if (monstro instanceof Entidades.PeDeMolequinho) {
@@ -191,15 +210,15 @@ public class GameLogic {
                     // O jogador fica onde está e agora tem um novo inimigo na frente dele.
                 } else {
                         System.out.println(jogador.getNome() + " derrotou " + monstro.getNome() + "!");
-                        celulaDestino.limparEntidade(); // Limpa o monstro
+                        //celulaDestino.limparEntidade(); // Limpa o monstro
 
                         // +++ INÍCIO MODIFICAÇÃO (REGRA 2: Movimento pós-vitória) +++
                         System.out.println(jogador.getNome() + " toma a posição do monstro!");
 
                         // (Esta é a mesma lógica de movimento da secção "else" abaixo)
-                        celulaDestino.setEntidade(jogador); // Coloca o jogador na nova célula
-                        celulaAtual.limparEntidade();       // Limpa o jogador da célula antiga
-                        this.posicaoJogador = proximaPosicao; // ATUALIZA a posição do jogador
+                        //celulaDestino.setEntidade(jogador); // Coloca o jogador na nova célula
+                        //celulaAtual.limparEntidade();       // Limpa o jogador da célula antiga
+                        //this.posicaoJogador = proximaPosicao; // ATUALIZA a posição do jogador
                         // +++ FIM MODIFICAÇÃO (REGRA 2) +++
             }
         }
