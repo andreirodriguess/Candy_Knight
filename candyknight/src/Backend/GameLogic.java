@@ -404,7 +404,6 @@ public class GameLogic {
         
         return monstro;
     }
-    
 
     private Coletavel getItemAleatorio(int nivel) {
         int tipo = random.nextInt(3); 
