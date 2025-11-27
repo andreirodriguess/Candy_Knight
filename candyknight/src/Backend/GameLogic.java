@@ -63,11 +63,10 @@ public class GameLogic {
             int posAtual = this.posicaoJogador;
             int proximaPosicao = -1;
             
-            // Variáveis para a mecânica de "Spawn" (nas costas do jogador)
+            // Variável para calcular onde seria a "costas" do jogador
             int posicaoOposta = -1; 
-            boolean opostaValida = false; 
 
-            // 1. Calcula destino e a posição oposta
+            // 1. Calcula destino e a posição oposta TEÓRICA (sem restrições de if)
             switch (direcao) {
                 case CIMA:
                     if (posAtual < 3) {
@@ -75,7 +74,7 @@ public class GameLogic {
                         return;
                     }
                     proximaPosicao = posAtual - 3;
-                    if (posAtual <= 5) { posicaoOposta = posAtual + 3; opostaValida = true; }
+                    posicaoOposta = posAtual + 3; // Oposta é sempre +3 (Baixo)
                     break;
 
                 case BAIXO:
@@ -84,7 +83,7 @@ public class GameLogic {
                         return;
                     }
                     proximaPosicao = posAtual + 3;
-                    if (posAtual >= 3) { posicaoOposta = posAtual - 3; opostaValida = true; }
+                    posicaoOposta = posAtual - 3; // Oposta é sempre -3 (Cima)
                     break;
 
                 case ESQUERDA:
@@ -93,7 +92,7 @@ public class GameLogic {
                         return;
                     }
                     proximaPosicao = posAtual - 1;
-                    if (posAtual % 3 != 2) { posicaoOposta = posAtual + 1; opostaValida = true; }
+                    posicaoOposta = posAtual + 1; // Oposta é sempre +1 (Direita)
                     break;
 
                 case DIREITA:
@@ -102,35 +101,57 @@ public class GameLogic {
                         return;
                     }
                     proximaPosicao = posAtual + 1;
-                    if (posAtual % 3 != 0) { posicaoOposta = posAtual - 1; opostaValida = true; }
+                    posicaoOposta = posAtual - 1; // Oposta é sempre -1 (Esquerda)
                     break;
             }
 
             // 2. Processa o movimento
             if (proximaPosicao != -1) {
+                // Tenta interagir (combate/item). Retorna true se o jogador efetivamente saiu da casa.
                 boolean jogadorSaiuDaCasa = processarInteracao(proximaPosicao);
                 
-                // +++ MECÂNICA: Se o jogador andou, puxa o tabuleiro +++
-                if (jogadorSaiuDaCasa && opostaValida) {
-                    this.nivelDificuldade++; // Dificuldade aumenta a cada passo
+                if (jogadorSaiuDaCasa) {
+                    this.nivelDificuldade++; 
                     
-                    Celula celulaAntiga = tabuleiro.get(posAtual); // Agora vazia
-                    Celula celulaOposta = tabuleiro.get(posicaoOposta); // Borda oposta
+                    Celula celulaAntiga = tabuleiro.get(posAtual); // A casa que ficou vazia
                     
-                    // Puxa o conteúdo da borda para o centro
-                    if (celulaOposta.temEntidade()) {
-                        celulaAntiga.setEntidade(celulaOposta.getEntidade());
-                        celulaOposta.limparEntidade();
+                    // Verifica se a posição oposta existe DENTRO do tabuleiro (0 a 8)
+                    boolean opostaExiste = (posicaoOposta >= 0 && posicaoOposta < TAMANHO_TABULEIRO);
+                    
+                    // Validação extra para Esquerda/Direita (para evitar que pule de linha, ex: 2 para 3)
+                    if (opostaExiste && (direcao == Direcao.ESQUERDA || direcao == Direcao.DIREITA)) {
+                        // Se estamos movendo horizontalmente, a oposta tem de estar na mesma linha da atual
+                        int linhaAtual = posAtual / 3;
+                        int linhaOposta = posicaoOposta / 3;
+                        if (linhaAtual != linhaOposta) {
+                            opostaExiste = false;
+                        }
                     }
-                    if (celulaOposta.temItem()) {
-                        celulaAntiga.setItem(celulaOposta.getItem());
-                        celulaOposta.limparItem();
+
+                    if (opostaExiste) {
+                        // === LÓGICA 1: ESTEIRA (Puxar da borda) ===
+                        // Se existe uma célula nas costas, puxamos o conteúdo dela para o centro
+                        Celula celulaOpostaObj = tabuleiro.get(posicaoOposta);
+                        
+                        if (celulaOpostaObj.temEntidade()) {
+                            celulaAntiga.setEntidade(celulaOpostaObj.getEntidade());
+                            celulaOpostaObj.limparEntidade();
+                        }
+                        if (celulaOpostaObj.temItem()) {
+                            celulaAntiga.setItem(celulaOpostaObj.getItem());
+                            celulaOpostaObj.limparItem();
+                        }
+                        // E geramos novo conteúdo na borda que ficou vazia
+                        gerarConteudoAleatorio(celulaOpostaObj);
+                        System.out.println(">>> O cenário avançou! (Spawn na borda oposta)");
+                        
+                    } else {
+                        // === LÓGICA 2: REPOSIÇÃO DIRETA (Borda para Meio) ===
+                        // Se não existe célula válida nas costas (estamos na borda),
+                        // apenas geramos novo conteúdo onde o jogador estava.
+                        gerarConteudoAleatorio(celulaAntiga);
+                        System.out.println(">>> Nova ameaça surgiu onde você estava!");
                     }
-                    
-                    // Gera novo conteúdo na borda (já fortalecido)
-                    gerarConteudoAleatorio(celulaOposta);
-                    
-                    System.out.println(">>> O cenário avançou! (Nível atual: " + this.nivelDificuldade + ")");
                 }
             }
         }
@@ -261,15 +282,18 @@ public class GameLogic {
     
     private void gerarConteudoAleatorio(Celula celula) {
         int roll = random.nextInt(10); 
-        if (roll < 4) { // 40% Monstro
+        if (roll < 5) { // 50% Monstro
             // Cria, fortalece e define na célula
             EntidadeJogo m = getMonstroAleatorio(this.nivelDificuldade);
             celula.setEntidade(m);
-        } else if (roll < 8) { // 40% Item
+        } else if (roll < 9) { // 40% Item
             // Cria, fortalece e define na célula
             Coletavel i = getItemAleatorio(this.nivelDificuldade);
             celula.setItem(i);
         } 
+        else{//10% vazio
+            System.out.println("A borda veio vazia\n");
+        }
     }
 
     private EntidadeJogo getMonstroAleatorio(int nivel) {
