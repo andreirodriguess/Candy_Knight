@@ -17,6 +17,7 @@ public class GameLogic {
     // Controle de Aleatoriedade e Dificuldade
     private Random random;
     private int nivelDificuldade;
+    private int numMovimentos;
 
     public enum Direcao {
         CIMA, BAIXO, ESQUERDA, DIREITA
@@ -30,12 +31,14 @@ public class GameLogic {
     public GameLogic() {
         this.tabuleiro = new ArrayList<>(TAMANHO_TABULEIRO);
         this.random = new Random(); 
-        this.nivelDificuldade = 0;  
+        this.nivelDificuldade = 0; 
+        this.numMovimentos = 0;
         iniciarTabuleiro();
     }
 
     public void iniciarTabuleiro() {
         partidaAtiva = true;
+        numMovimentos = 0;
         nivelDificuldade = 0; // Reseta dificuldade (nível 0)
         
         tabuleiro.clear();
@@ -111,7 +114,9 @@ public class GameLogic {
                 boolean jogadorSaiuDaCasa = processarInteracao(proximaPosicao);
                 
                 if (jogadorSaiuDaCasa) {
-                    this.nivelDificuldade++; 
+                    //a cada 5 movimentos ele aumenta um nivel
+                    this.numMovimentos++; 
+                    this.nivelDificuldade = numMovimentos/5;
                     
                     Celula celulaAntiga = tabuleiro.get(posAtual); // A casa que ficou vazia
                     
@@ -168,9 +173,20 @@ public class GameLogic {
         // 1. Item
         if (celulaDestino.temItem()) {
             Coletavel item = celulaDestino.getItem();
-            System.out.println(jogador.getNome() + " usou " + item.getNome());
-            item.usar(jogador);
-            celulaDestino.limparItem(); 
+            //se for uma espada e o jogador estiver armado, aumenta o dano
+            if(item instanceof Coletaveis.EspadaDeAlcacuz && jogador.getArmado())
+            {           
+                int danoAtual = jogador.getArma().getAtaque();
+                int danoItem = ((EspadaDeAlcacuz) item).getAtaque();
+                jogador.getArma().setAtaque(danoAtual + danoItem,jogador);
+                System.out.println("espada teve o dano aumentado em " + danoItem);
+                
+            }
+            else{
+                System.out.println(jogador.getNome() + " usou " + item.getNome());
+                item.usar(jogador);
+                celulaDestino.limparItem(); 
+            }
         }
 
         // 2. Entidade (Monstro)
@@ -179,21 +195,22 @@ public class GameLogic {
             System.out.println("Encontro: " + monstro.getNome() + " (Vida: " + monstro.getPontosDeVidaAtuais() + ")");
             
             if (jogador.getArmado()) {
+                int vidaAtualMonstro = monstro.getPontosDeVidaAtuais();
                 this.CombateArmado = true;
-                jogador.atacar(monstro);
-                if(jogador.getArma().getAtaque() < monstro.getPontosDeVidaAtuais()){
+                //if(jogador.getArma().getAtaque() >=  monstro.getPontosDeVidaAtuais()){
                     // Desgaste da arma
-                    jogador.getArma().setAtaque(jogador.getArma().getAtaque() - monstro.getPontosDeVidaAtuais(), jogador);
+                    jogador.atacar(monstro);
+                    jogador.getArma().setAtaque(jogador.getArma().getAtaque() - vidaAtualMonstro, jogador);
                     
                     //garantir que a arma quebre se chegar a 0:
                     if(jogador.getArma().getAtaque()<=0){
-                        jogador.getArma().quebrar(jogador);
+                       jogador.getArma().quebrar(jogador);
                     }
                     
-                } else {
+                //} else {
                     
-                    jogador.getArma().quebrar(jogador);
-                }
+                  //  jogador.getArma().quebrar(jogador);
+                //}
                 
                 
             } else {
@@ -204,7 +221,7 @@ public class GameLogic {
                     celulaDestino.setEntidade(jogador);
                     this.posicaoJogador = proximaPosicao;
                     jogador.desativarEscudoDeTroca();
-                    return true; 
+                    return false; 
                 } else {
                     // Dano direto
                     jogador.receberDano(monstro.getPontosDeVidaAtuais());
@@ -281,12 +298,12 @@ public class GameLogic {
     // +++ MÉTODOS DE GERAÇÃO COM FORTALECER() +++
     
     private void gerarConteudoAleatorio(Celula celula) {
-        int roll = random.nextInt(10); 
-        if (roll < 5) { // 50% Monstro
+        int roll = random.nextInt(20); 
+        if (roll < 9) { // 45% Monstro
             // Cria, fortalece e define na célula
             EntidadeJogo m = getMonstroAleatorio(this.nivelDificuldade);
             celula.setEntidade(m);
-        } else if (roll < 9) { // 40% Item
+        } else if (roll < 19) { // 45% Item
             // Cria, fortalece e define na célula
             Coletavel i = getItemAleatorio(this.nivelDificuldade);
             celula.setItem(i);
