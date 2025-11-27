@@ -28,4 +28,8 @@ public class PocaoDeCalda implements Coletavel {
         cavaleiro.curar(this.cura);
         System.out.println("Vida recuperada em " + this.cura + " pontos!");
     }
+    @Override
+    public void fortalecer(int nivel) {
+        this.cura = cura + (nivel /4);
+    }
 }

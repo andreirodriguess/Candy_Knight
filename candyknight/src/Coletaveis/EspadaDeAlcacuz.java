@@ -54,4 +54,9 @@ public class EspadaDeAlcacuz extends Arma {
         cavaleiro.setArma(null);
         cavaleiro.setPotencia(0);
     }
+    @Override
+    public void fortalecer(int nivel) {
+        // Aumenta o ataque em 1 a cada 4 niveis
+        this.ataque = ataque + (nivel / 4);
+    }
 }

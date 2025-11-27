@@ -32,7 +32,7 @@ public class ControleJanela extends JFrame{
     }
     
     public void ScreenGame(){
-        ScreenGame game = new ScreenGame(resolucaoLARGURA,resolucaoALTURA);
+        ScreenGame game = new ScreenGame(resolucaoLARGURA,resolucaoALTURA,this);
         this.setContentPane(game);
         
         

@@ -21,10 +21,13 @@ public class ScreenGame extends JLayeredPane{
     public int tamanhoSprite = 100;
     
     
-    GameHUD FrontPanel;
-    GameBackground BackPanel;
+    public GameHUD FrontPanel;
+    public GameBackground BackPanel;
+    public ControleJanela JControl;
     
-    public ScreenGame(int largura, int altura) {
+    public ScreenGame(int largura, int altura,ControleJanela JC) {
+        
+        JControl = JC;
         
         this.setPreferredSize(new Dimension(largura, altura));// TAmanho do painel de camadas
         

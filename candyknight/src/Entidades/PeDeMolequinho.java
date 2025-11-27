@@ -4,7 +4,7 @@ public class PeDeMolequinho extends MonstroDoce {
 
     public PeDeMolequinho() {
         // Nome, Vida, Ataque, Recompensa
-        super("Pé de Molequinho (Casca)", 5, 5, 10);
+        super("PeDeMoleque", 5, 5, 10);
     }
 
     @Override

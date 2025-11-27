@@ -91,6 +91,15 @@ public abstract class EntidadeJogo {
         return false;
     }
     
-    
+    public void fortalecer(int nivel) {
+        if (nivel <= 0) return;
+
+        // Aumenta a vida em 1 a cada 3 niveis
+        int novaVida = this.getPontosDeVidaAtuais() + (nivel / 3);
+        this.setPontosDeVidaMax(novaVida);
+        this.setPontosDeVidaAtuais(novaVida); // Cura o monstro para a nova vida máxima
+
+        System.out.println(">>> O " + this.getNome() + " apareceu mais forte! (Nível " + nivel + ")");
+    }
     
 }

@@ -14,9 +14,11 @@ public class ScreenMenu extends JLayeredPane {
     JButton buttonStart;
     JButton buttonExit;
     Font fonteTitulo = new Font("Arial", Font.BOLD, 48);
-    Font fonteBotoes = new Font("Arial", Font.PLAIN, 22);
+    Font fonteBotoes = new Font("Comic Sans MS", Font.PLAIN, 40);
+    ControleJanela JControl;
     
-    public ScreenMenu(int largura, int altura, ControleJanela JControl) {
+    public ScreenMenu(int largura, int altura, ControleJanela JC) {
+        this.JControl=JC;
         this.setLayout(null);
         this.setPreferredSize(new Dimension(largura, altura));
         

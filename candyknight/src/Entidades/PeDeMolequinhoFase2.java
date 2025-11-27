@@ -12,7 +12,7 @@ public class PeDeMolequinhoFase2 extends MonstroDoce {
     
     public PeDeMolequinhoFase2() {
         // Nome, Vida, Ataque, Recompensa
-        super("Fragmentos de Amendoim", 2, 5, 50);
+        super("PeDeMolequinho", 2, 5, 50);
     }
     
     public void atacar(EntidadeJogo alvo) {

@@ -8,14 +8,8 @@ import Coletaveis.*;
 
 import java.awt.Color;
 import java.awt.*;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
 import java.util.List;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 import javax.swing.*;
 
@@ -29,12 +23,12 @@ public class GameHUD extends JPanel implements KeyListener,ActionListener{
     private List<Celula> tabuleiro = new ArrayList<>();
     
     
-    //Para desenhar na tela
+    //Para desenhar na tela 
     private int X;
     private int Y;
     Image sprite;
     
-    //Variáveis auxiliares para deslocamento:
+    //Variáveis auxiliares para deslocamento das cartas:
     private boolean animaDeslocamento = false;//Variável que sinaliza se está tendo uma animação de deslocamento
     private int Xatual;//Pos atual
     private int Yatual;
@@ -44,17 +38,19 @@ public class GameHUD extends JPanel implements KeyListener,ActionListener{
     private int Yf;
     
     private GameLogic.Direcao direcaoMov = null;
-    private final int passo = 10;//Velocidade com que as imagens se movem
-    private boolean chegouX;//Sinaliza que chegou no destino X
-    private boolean chegouY;//Sinaliza que chegou no destino Y
+    private final int passo = 10;//Velocidade com que os sprites se movem
+    private boolean chegouX;//Sinaliza que chegou no destino X na anim
+    private boolean chegouY;//Sinaliza que chegou no destino Y naanimação
     
     
     
-    public GameHUD(int larguraPainel,int alturaPainel, ScreenGame sg) {//Passo Screengame como parametro pra poder acessar suas variáveis
+    public GameHUD(int larguraPainel,int alturaPainel, ScreenGame sg) {//Passo Screengame como parametro pra poder acessar as variáveis
         this.sg = sg;
         Timer gameTimer = new Timer(16, (ActionListener) this); 
         gameTimer.start();
         
+        
+        //Conrtolar teclado
         this.setFocusable(true); 
         this.addKeyListener(this);
     }
@@ -75,11 +71,19 @@ public class GameHUD extends JPanel implements KeyListener,ActionListener{
         super.paintComponent(g); 
         Graphics2D g2d = (Graphics2D) g;
         
-        mostrarCelulas(g2d);
+        this.mostrarPontuacao(g2d);
         
+        //Se a partida estiver ativa
+        if(this.gameControl.getPartidaAtivo() == true){
+            
+            this.mostrarCelulas(g2d);
+        }else{
+            this.gameOverScreen(g2d);
+        }
     }
     
-    public void mostrarCelulas(Graphics2D g2d){
+    //métodos para desenho na janela
+    private void mostrarCelulas(Graphics2D g2d){
         this.tabuleiro = this.gameControl.getTabuleiro();
         
         for(int i=0;i<9;i++){
@@ -90,9 +94,27 @@ public class GameHUD extends JPanel implements KeyListener,ActionListener{
             }
         }
     }
-    
-    
-    public void desenharImagem(Image imagem,int X,int Y,int size,Graphics2D g2d){
+    private void mostrarPontuacao(Graphics2D g2d) {
+        //PONTUAÇÃO DO JOGADOR:
+        int pontosAtuais = this.gameControl.getPontuacaoAtual();
+        
+         //Dimensões da tela
+        int larguraTela = this.getWidth();
+        int alturaTela = this.getHeight();
+        int larguraQuadro = 200;
+        int alturaQuadro = 50;
+        int X = ((larguraTela-larguraQuadro)/2)-80;
+        int Y = 5;
+        
+        
+        g2d.setFont(new Font("Comic Sans MS", Font.BOLD, 25));
+        g2d.setColor(Color.getHSBColor(0.2f, 0.5f, 1.0f));
+        g2d.drawString(pontosAtuais + " moedas",X,Y+(this.sg.tamanhoSprite/2)-15);
+        
+        desenharImagem(this.arquivo.moeda,X-(this.sg.tamanhoSprite/2),Y,this.sg.tamanhoSprite/2,g2d);
+        
+    }
+    private void desenharImagem(Image imagem,int X,int Y,int size,Graphics2D g2d){
         //Tenta desenhar na tela uma imagem na tela tamanho (size X size)
         if (imagem!= null) {
                 g2d.drawImage(imagem, X, Y, size, size, this);
@@ -101,7 +123,7 @@ public class GameHUD extends JPanel implements KeyListener,ActionListener{
                 g2d.fillRect(X, Y, size, size);
             }
     }
-    public void desenharItem(Coletavel C,int indice,Graphics2D g2d){
+    private void desenharItem(Coletavel C,int indice,Graphics2D g2d){
         sprite = this.arquivo.getImage(C.getNome());
         X = this.getPosXFromCard(indice);
         Y = this.getPosYFromCard(indice);
@@ -110,7 +132,7 @@ public class GameHUD extends JPanel implements KeyListener,ActionListener{
         this.desenharImagem(sprite, X+Xoffset, Y+Yoffset, this.sg.tamanhoSprite, g2d);
         
     }
-    public void desenharEntidade(EntidadeJogo E,int indice, Graphics2D g2d){
+    private void desenharEntidade(EntidadeJogo E,int indice, Graphics2D g2d){
         sprite = this.arquivo.getImage(E.getNome());
         X = this.getPosXFromCard(indice);
         Y = this.getPosYFromCard(indice);
@@ -143,7 +165,7 @@ public class GameHUD extends JPanel implements KeyListener,ActionListener{
             }
         }
     }
-    public void desenharArmaNaMao(Image imagemArma,int X,int Y,Graphics2D g2d,int dano){
+    private void desenharArmaNaMao(Image imagemArma,int X,int Y,Graphics2D g2d,int dano){
         this.desenharImagem(imagemArma, X-15, Y+45,(this.sg.tamanhoSprite-this.sg.tamanhoSprite/4), g2d);
         //Apresentar força da arma que está sendo apresentada
         g2d.setFont(new Font("Arial", Font.BOLD, 20));
@@ -151,7 +173,7 @@ public class GameHUD extends JPanel implements KeyListener,ActionListener{
         g2d.drawString(""+dano, X+10, Y+this.sg.cartaAltura-10);
         
     }
-    public void desenharEscudo(Image imagemArma,int X,int Y,Graphics2D g2d){
+    private void desenharEscudo(Image imagemArma,int X,int Y,Graphics2D g2d){
         
         int Xoffset = this.sg.cartaLargura-80;
         int Yoffset = (this.sg.cartaAltura/4)+10;
@@ -160,7 +182,40 @@ public class GameHUD extends JPanel implements KeyListener,ActionListener{
         
         
     }
-    
+    private void gameOverScreen(Graphics2D g2d) {
+        //Dimensões da tela
+        int larguraTela = this.getWidth();
+        int alturaTela = this.getHeight();
+        int larguraQuadro = 800;
+        int alturaQuadro = 500;
+        int Xq = (larguraTela-larguraQuadro)/2;
+        int Yq = (alturaTela-alturaQuadro)/2;
+        
+        int larguraTexto = 700;
+        int alturaTexto = 400;
+        int Xmsg = (larguraQuadro - larguraTexto) / 2; // Cálculo para centralizar no quadrinho
+        int Ymsg = (alturaQuadro - alturaTexto) / 6; 
+
+        g2d.fillRect(Xq,Yq, larguraQuadro, alturaQuadro);
+
+        JLabel texto = new JLabel("FIM DE JOGO",SwingConstants.CENTER);
+        texto.setFont(new Font("Comic Sans MS", Font.BOLD,60));
+        texto.setForeground(Color.getHSBColor(0.95f, 0.8f, 0.9f));
+        texto.setBounds(Xq+Xmsg, Yq+Ymsg, larguraTexto, alturaTexto);
+        this.add(texto);
+        
+        larguraTexto = 400;
+        alturaTexto = 250;
+        Xmsg = (larguraQuadro - larguraTexto) / 2; // Cálculo para centralizar no quadro
+        Ymsg = ((alturaQuadro - alturaTexto) / 2)+200; 
+        
+        int pontuacaoFinal = this.gameControl.getPontucaoFinal();
+        JLabel texto2 = new JLabel("Pontuação: " + pontuacaoFinal,SwingConstants.CENTER);
+        texto2.setFont(new Font("Comic Sans MS", Font.BOLD,30));
+        texto2.setForeground(Color.getHSBColor(0.95f, 0.1f, 0.8f));
+        texto2.setBounds(Xq+Xmsg, Yq+Ymsg, larguraTexto, alturaTexto/5);
+        this.add(texto2);
+    }
     
     //métodos de auxílio - Implementado()
     private void setPosFinal(int X,int Y,int direcao){
@@ -335,7 +390,7 @@ public class GameHUD extends JPanel implements KeyListener,ActionListener{
                 leftPressed = false;
                 break;
             case KeyEvent.VK_D:
-            case KeyEvent.VK_RIGHT:
+             case KeyEvent.VK_RIGHT:
                 rightPressed = false;
                 break;
         }
@@ -344,5 +399,8 @@ public class GameHUD extends JPanel implements KeyListener,ActionListener{
     @Override
     public void keyTyped(KeyEvent e) {
     }
+
+    
+
     
 }
