@@ -323,6 +323,9 @@ public class GameLogic {
                     celulaDestino.setEntidade(fase2);
                     return false; // Jogador travado, não avança
                 }
+                    // NÃO MOVE O JOGADOR (jogadorSaiuDaCasa continua false)
+                    // O jogador fica onde está e agora tem um novo inimigo na frente dele.
+                } 
                 
                 //Se não for um pe de moleque:
                 else if (monstro instanceof Entidades.MonstroDoce) {
@@ -363,7 +366,6 @@ public class GameLogic {
             celulaDestino.setEntidade(jogador); 
             celulaAtual.limparEntidade();       
             this.posicaoJogador = proximaPosicao; 
-            System.out.println(jogador.getNome() + " se moveu para a posição " + proximaPosicao);
             return true; 
         }
     }

@@ -196,6 +196,7 @@ public class GameHUD extends JPanel implements KeyListener,ActionListener{
         int Xmsg = (larguraQuadro - larguraTexto) / 2; // Cálculo para centralizar no quadrinho
         int Ymsg = (alturaQuadro - alturaTexto) / 6; 
 
+        g2d.setColor(Color.getHSBColor(0.50f, 0.8f, 0.2f));
         g2d.fillRect(Xq,Yq, larguraQuadro, alturaQuadro);
 
         JLabel texto = new JLabel("FIM DE JOGO",SwingConstants.CENTER);
