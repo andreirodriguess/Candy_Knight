@@ -13,9 +13,10 @@ import java.util.Random;
 /**
  * Classe central que gerencia o estado do jogo, o tabuleiro
  * e as interações entre as células.
+ * Classe central que gerencia o estado do jogo.
+ * Mecânica: Infinite Crawler (Tabuleiro móvel) com método fortalecer().
  */
 public class GameLogic {
-    
     
     private boolean partidaAtiva;
     private int pontuacaoFinal = 0;
@@ -24,17 +25,14 @@ public class GameLogic {
      * Define as direções de movimento possíveis.
      * Usar um enum torna o código mais limpo e seguro.
      */
+    
     // Controle de Aleatoriedade e Dificuldade
     private Random random;
     private int nivelDificuldade;
+
     public enum Direcao {
-        CIMA,//0
-        BAIXO,//1
-        ESQUERDA,//2
-        DIREITA//3
         CIMA, BAIXO, ESQUERDA, DIREITA
     }
-    // +++ Fim da Adição +++
 
     private ArrayList<Celula> tabuleiro;
     private final int TAMANHO_TABULEIRO = 9; // 3x3
@@ -62,6 +60,7 @@ public class GameLogic {
         }
 
         // 2. Adiciona o jogador (ex: posição 4, o centro)
+        
         //por player na celula central
         tabuleiro.get(4).setEntidade(new Entidades.Cavaleiro("player"));
         this.posicaoJogador = 4;
@@ -112,6 +111,7 @@ public class GameLogic {
                         System.out.println("Borda do mapa (Topo).");
                         return;
                     }
+                    proximaPosicao = posAtual - 3;
                     if (posAtual <= 5) { posicaoOposta = posAtual + 3; opostaValida = true; }
                     break;
 
@@ -296,6 +296,7 @@ public class GameLogic {
                     // VERIFICAÇÃO ESPECIAL: É O PÉ DE MOLEQUINHO?
                 //Verifica se é uma pé de moleque, se for, passa para a fase 2
                 if (monstro instanceof Entidades.PeDeMolequinho) {
+<<<<<<< Updated upstream
                     System.out.println(">>> AVISO: O monstro se dividiu em fragmentos perigosos!");
 
                     // Em vez de limpar a célula, substituímos pelo monstro da Fase 2
@@ -315,6 +316,7 @@ public class GameLogic {
                         //celulaAtual.limparEntidade();       // Limpa o jogador da célula antiga
                         //this.posicaoJogador = proximaPosicao; // ATUALIZA a posição do jogador
                         // +++ FIM MODIFICAÇÃO (REGRA 2) +++
+=======
                     System.out.println(">>> O Pé de Molequinho se dividiu em fragmentos!");
                     Entidades.PeDeMolequinhoFase2 fase2 = new Entidades.PeDeMolequinhoFase2();
                     fase2.fortalecer(this.nivelDificuldade); // Fortalece o novo monstro também
@@ -348,6 +350,7 @@ public class GameLogic {
                 }
                 
                 
+>>>>>>> Stashed changes
             }
         }
             
@@ -435,8 +438,6 @@ public class GameLogic {
        }
        System.out.println("=== GAME OVER === Pontuação: " + pontuacaoFinal);
     }
-    public ArrayList<Celula> getTabuleiro() {
-        return this.tabuleiro;
     public int getPontuacaoAtual(){
         return ((Cavaleiro)this.tabuleiro.get(posicaoJogador).getEntidade()).getDinheiro();
     }
