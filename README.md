@@ -1,6 +1,6 @@
 # 🍬 Candy Knight
 
-Candy Knight é um jogo de estratégia rogue-like em turnos, fortemente inspirado na jogabilidade de Dungeon Cards. Você assume o papel de um Cozinheiro Cavaleiro que deve enfrentar hordas de monstros feitos de doces para coletar o máximo de moedas possível.
+Candy Knight é um jogo de estratégia em turnos, fortemente inspirado na jogabilidade de Dungeon Cards. Você assume o papel de um Cozinheiro Cavaleiro que deve enfrentar hordas de monstros feitos de doces para coletar o máximo de moedas possível.
 
 ## Como Funciona o Jogo
 
