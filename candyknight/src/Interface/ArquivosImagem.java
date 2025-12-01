@@ -17,6 +17,7 @@ public class ArquivosImagem {
     public Image menu = this.InicializarGif("/Imagens/menu.gif");
     public Image carta = this.InicializarImagens("/Imagens/carta.png");
     public Image moeda = this.InicializarImagens("/Imagens/moeda.png");
+    public Image backgroundGame = this.InicializarImagens("/Imagens/Background.png");
     
     public Image getImage(String nomeDaImagem){
         Image imagem;

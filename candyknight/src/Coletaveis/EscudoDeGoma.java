@@ -4,7 +4,7 @@ import Entidades.Cavaleiro;
 
 public class EscudoDeGoma implements Coletavel {
     
-    private int duracaoEmMovimentos = 2;
+    private int duracaoEmMovimentos = 1;
 
     @Override
     public String getNome() {

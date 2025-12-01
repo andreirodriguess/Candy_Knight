@@ -1,13 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package Entidades;
 import Coletaveis.*;
-/**
- *
- * @author felip
- */
+
 public abstract class EntidadeJogo {
 
     private String nome;
@@ -97,7 +91,7 @@ public abstract class EntidadeJogo {
         // Aumenta a vida em 1 a cada 3 niveis
         int novaVida = this.getPontosDeVidaAtuais() + (nivel / 3);
         this.setPontosDeVidaMax(novaVida);
-        this.setPontosDeVidaAtuais(novaVida); // Cura o monstro para a nova vida máxima
+        this.setPontosDeVidaAtuais(novaVida); 
 
         System.out.println(">>> O " + this.getNome() + " apareceu mais forte! (Nível " + nivel + ")");
     }

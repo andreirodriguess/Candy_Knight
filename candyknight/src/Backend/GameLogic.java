@@ -5,10 +5,6 @@ import Entidades.*;
 import java.util.ArrayList;
 import java.util.Random; 
 
-/**
- * Classe central que gerencia o estado do jogo.
- * Mecânica: Infinite Crawler (Tabuleiro móvel) com método fortalecer().
- */
 public class GameLogic {
     
     private boolean partidaAtiva;
@@ -295,9 +291,9 @@ public class GameLogic {
         }
     }
     
-    // +++ MÉTODOS DE GERAÇÃO COM FORTALECER() +++
     
     private void gerarConteudoAleatorio(Celula celula) {
+        
         int roll = random.nextInt(20); 
         if (roll < 9) { // 45% Monstro
             // Cria, fortalece e define na célula
@@ -317,14 +313,12 @@ public class GameLogic {
         int tipo = random.nextInt(3);
         EntidadeJogo monstro;
         
-        // 1. Escolhe o tipo (Construtor Vazio)
         switch (tipo) {
             case 0: monstro = new UrsoDeGoma(); break;
             case 1: monstro = new SoldadoGengibre(); break;
             default: monstro = new PeDeMolequinho(); break;
         }
         
-        // 2. Fortalece
         monstro.fortalecer(nivel);
         
         return monstro;

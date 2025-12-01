@@ -85,9 +85,10 @@ public class GameBackground extends JPanel{
     //pinta o fundo:
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g); // Desenha o fundo HSB
+        super.paintComponent(g); 
         Graphics2D g2d = (Graphics2D) g;
 
+        pintarFundo(g2d);
         // Se screenGame ainda não foi definido, não faz nada
         if (this.sg == null) {
             return;
@@ -95,6 +96,14 @@ public class GameBackground extends JPanel{
 
         pintarGrid(g2d);
     }
+    
+    private void pintarFundo(Graphics2D g2d) {
+        int larguraTela = this.getWidth();
+        int alturaTela = this.getHeight();
+        
+        desenharImagem(arquivo.backgroundGame,0,0,larguraTela,alturaTela,g2d);
+    }
+    
     public void pintarGrid(Graphics2D g2d){
         // Calcula a distância total de um slot para o próximo
         int distanciaX = this.sg.cartaLargura + this.sg.gridGap;
@@ -119,4 +128,6 @@ public class GameBackground extends JPanel{
                 g2d.fillRect(X, Y, largura, altura);
             }
     }
+
+    
 }
