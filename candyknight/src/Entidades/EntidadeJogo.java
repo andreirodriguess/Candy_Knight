@@ -7,7 +7,7 @@ public abstract class EntidadeJogo {
     private String nome;
     private int pontosDeVidaMax;
     private int pontosDeVidaAtuais;
-    private int potencia; //capacidade de causar dano/curar
+    private int potencia; 
     private boolean armado;
     
 

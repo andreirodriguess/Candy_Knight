@@ -59,8 +59,9 @@ public class GameBackground extends JPanel{
             });
             this.add(ButtonMenu);
     }
+    
     private void addButtonRestart(){
-            JButton ButtonRestart = new JButton("Restart");
+            JButton ButtonRestart = new JButton("Reiniciar");
             ButtonRestart.setFont(new Font("Comic Sans MS", Font.PLAIN, 30));
             ButtonRestart.setBounds(this.largura - (this.buttonGap + this.buttonWidth),this.buttonGap, this.buttonWidth, this.buttonHeight);
             // Adicionando a ação ao botão menu
@@ -74,6 +75,7 @@ public class GameBackground extends JPanel{
             });
             this.add(ButtonRestart);
     }
+    
     private void setGridPosicao(int larguraPainel, int alturaPainel){
         //posiciona o grid no painel
         int larguraTotalGrid = (this.sg.cartaLargura*this.sg.gridSize) + (this.sg.gridGap*(this.sg.gridSize-1));

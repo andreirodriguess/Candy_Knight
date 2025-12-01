@@ -150,7 +150,7 @@ public class GameLogic {
                         // === LÓGICA 2: REPOSIÇÃO DIRETA (Borda para Meio) ===
                         // Se não existe célula válida nas costas (estamos na borda),
                         // apenas geramos novo conteúdo onde o jogador estava.
-                        gerarConteudoAleatorio(celulaAntiga);
+                        gerarConteudoAleatorioNovo(celulaAntiga);
                         System.out.println(">>> Nova ameaça surgiu onde você estava!");
                     }
                 }
@@ -292,20 +292,81 @@ public class GameLogic {
     }
     
     
-    private void gerarConteudoAleatorio(Celula celula) {
+     private void gerarConteudoAleatorio(Celula celula) {
         
-        int roll = random.nextInt(20); 
-        if (roll < 9) { // 45% Monstro
-            // Cria, fortalece e define na célula
-            EntidadeJogo m = getMonstroAleatorio(this.nivelDificuldade);
-            celula.setEntidade(m);
-        } else if (roll < 19) { // 45% Item
-            // Cria, fortalece e define na célula
-            Coletavel i = getItemAleatorio(this.nivelDificuldade);
-            celula.setItem(i);
-        } 
-        else{//10% vazio
-            System.out.println("A borda veio vazia\n");
+        int roll = random.nextInt(100);//Sorteia um valor
+        
+            if (roll < 50) { // 50% Monstro
+                // Cria, fortalece e define na célula
+                EntidadeJogo m = getMonstroAleatorio(this.nivelDificuldade);
+                celula.setEntidade(m);
+            } else if (roll <= 100) { // 50% Item
+                // Cria, fortalece e define na célula
+                Coletavel i = getItemAleatorio(this.nivelDificuldade);
+                celula.setItem(i);
+            } 
+            else{//10% vazio
+                System.out.println("A borda veio vazia\n");
+            }
+        
+    }
+     
+    private void gerarConteudoAleatorioNovo(Celula celula) {
+        int qtdEntidade = 0;
+        int qtdItem = 0;
+        
+        //Contar quantas entidades ou itens tem no tabuleiro
+        for (Celula C : this.tabuleiro){
+            if(C.temEntidade()){
+                qtdEntidade++;
+            }
+            else if(C.temItem()){
+                qtdItem++;
+            }
+        }
+        
+        
+        int roll = random.nextInt(100);//Sorteia um valor
+        
+        if(qtdEntidade>4){
+            if (roll < 10) { // 10% Monstro
+                // Cria, fortalece e define na célula
+                EntidadeJogo m = getMonstroAleatorio(this.nivelDificuldade);
+                celula.setEntidade(m);
+            } else if (roll < 90) { // 80% Item
+                // Cria, fortalece e define na célula
+                Coletavel i = getItemAleatorio(this.nivelDificuldade);
+                celula.setItem(i);
+            } 
+            else{//10% vazio
+                System.out.println("A borda veio vazia\n");
+            }
+        }else if(qtdItem>4){
+           if (roll < 80) { // 80% Monstro
+                // Cria, fortalece e define na célula
+                EntidadeJogo m = getMonstroAleatorio(this.nivelDificuldade);
+                celula.setEntidade(m);
+            } else if (roll < 90) { // 10% Item
+                // Cria, fortalece e define na célula
+                Coletavel i = getItemAleatorio(this.nivelDificuldade);
+                celula.setItem(i);
+            } 
+            else{//10% vazio
+                System.out.println("A borda veio vazia\n");
+            }
+        }else{
+            if (roll < 45) { // 45% Monstro
+                // Cria, fortalece e define na célula
+                EntidadeJogo m = getMonstroAleatorio(this.nivelDificuldade);
+                celula.setEntidade(m);
+            } else if (roll < 90) { // 45% Item
+                // Cria, fortalece e define na célula
+                Coletavel i = getItemAleatorio(this.nivelDificuldade);
+                celula.setItem(i);
+            } 
+            else{//10% vazio
+                System.out.println("A borda veio vazia\n");
+            }
         }
     }
 
@@ -340,7 +401,7 @@ public class GameLogic {
         
         return item;
     }
-    // +++ FIM +++
+    
 
     public void encerrarPartida(){
        this.partidaAtiva = false;
