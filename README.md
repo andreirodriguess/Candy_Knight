@@ -37,4 +37,12 @@ Derrote monstros para que eles deixem cair Moedas. Colete-as para aumentar sua p
 
 
 ## Como Rodar o Jogo
-a fazer
+
+1.  Baixe o repositório:
+    ```bash
+    git clone https://github.com/andreirodriguess/Candy_Knighthttps://github.com/andreirodriguess/Candy_Knight
+    ```
+
+2. Abra o projeto no Netbeans e clique em "Clean and Build Project"
+
+3. Compile o projeto
